@@ -5,7 +5,7 @@ import 'package:youtube_translation/services/dto/chat_gpt/gpt_response.dart';
 
 class TranslateHttps {
   static const _chatGPTUrl = 'https://api.openai.com/v1/chat/completions';
-  static const _apiKey = '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';
+
 
   static Future translate(String srtTxt) async {
     var result = await http.post(Uri.parse(_chatGPTUrl),
