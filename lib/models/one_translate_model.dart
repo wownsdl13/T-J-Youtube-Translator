@@ -1,18 +1,17 @@
 class OneTranslateModel {
   OneTranslateModel({
+    required this.order,
     required this.period,
-    String? korean,
-    String? english,
+    required String korean,
+    required String english,
   })  : _korean = korean,
         _english = english;
 
+  final int order;
   final String period;
-  String? _korean;
+  final String _korean;
 
-  String? get korean {
-    if (_korean == null) {
-      return _korean;
-    }
+  String get korean {
     if (quotes) {
       return '"$_korean"';
     }
@@ -22,14 +21,9 @@ class OneTranslateModel {
     return _korean;
   }
 
-  set setKorean(String korean) => _korean = korean;
+  final String _english;
 
-  String? _english;
-
-  String? get english {
-    if (_english == null) {
-      return _english;
-    }
+  String get english {
     if (quotes) {
       return '"$_english"';
     }
@@ -38,8 +32,6 @@ class OneTranslateModel {
     }
     return _english;
   }
-
-  set setEnglish(String english) => _english = english;
 
   bool _quotes = false;
 

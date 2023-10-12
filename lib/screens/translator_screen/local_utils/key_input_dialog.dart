@@ -12,9 +12,9 @@ class KeyInputDialog{
     final screenBox = context.findRenderObject() as RenderBox;
     final offset = renderBox.localToGlobal(Offset.zero);
     var textEditController = TextEditingController();
-    textEditController.text = await ChatGPTUtil.getKey ?? '';
+    textEditController.text = await ChatGPTKey.getKey ?? '';
     textEditController.addListener(() async{
-      await ChatGPTUtil.setKey(textEditController.text);
+      await ChatGPTKey.setKey(textEditController.text);
     });
     _overlayEntry = OverlayEntry(
       builder: (context) => Material(

@@ -1,6 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ChatGPTUtil {
+class ChatGPTKey {
   static const _key = 'key';
   static Future<bool> get hasKey async {
     var s = await SharedPreferences.getInstance();
