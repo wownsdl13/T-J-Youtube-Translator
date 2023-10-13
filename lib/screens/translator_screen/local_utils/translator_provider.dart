@@ -100,7 +100,7 @@ class TranslatorProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool _addOriginal = true;
+  bool _addOriginal = false;
   bool get addOriginal => _addOriginal;
   set setAddOriginal(bool addOriginal){
     _addOriginal = addOriginal;

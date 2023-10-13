@@ -9,7 +9,6 @@ class TranslateHttps {
   static const _chatGPTUrl = 'https://api.openai.com/v1/chat/completions';
 
   static Future<Map<String, String>> translateTxt(String srtTxt) async {
-    print('srtText > ${srtTxt}');
     var result = await http.post(Uri.parse(_chatGPTUrl),
         headers: {
           'Content-type': 'application/json; charset=utf-8',
