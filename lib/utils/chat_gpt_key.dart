@@ -4,7 +4,7 @@ class ChatGPTKey {
   static const _key = 'key';
   static Future<bool> get hasKey async {
     var s = await SharedPreferences.getInstance();
-    return s.getString(_key) == null;
+    return s.getString(_key) != null;
   }
 
   static Future<String?> get getKey async {

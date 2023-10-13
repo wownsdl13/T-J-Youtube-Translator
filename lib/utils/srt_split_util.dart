@@ -18,7 +18,7 @@ class SrtSplitUtil{
             subtitle += '\n';
           }
           subtitle += split[++index].trim();
-        }while(split[index + 1].trim().isNotEmpty);
+        }while(split.length > index + 1 && split[index + 1].trim().isNotEmpty);
         list.add(OneSrtModel(order, time, subtitle));
       }
     }

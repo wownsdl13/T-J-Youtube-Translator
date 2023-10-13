@@ -3,15 +3,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropzone/flutter_dropzone.dart';
 import 'package:provider/provider.dart';
-import 'package:youtube_translation/screens/translator_screen/local_utils/key_input_dialog.dart';
+import 'package:youtube_translation/models/one_translate_model.dart';
 import 'package:youtube_translation/screens/translator_screen/local_utils/translator_provider.dart';
 import 'package:youtube_translation/screens/translator_screen/local_widgets/description_translate_widget.dart';
 import 'package:youtube_translation/screens/translator_screen/local_widgets/drag_drop.dart';
 import 'package:youtube_translation/screens/translator_screen/local_widgets/float_btn.dart';
 import 'package:youtube_translation/screens/translator_screen/local_widgets/title_translate_widget.dart';
 import 'package:youtube_translation/screens/translator_screen/local_widgets/translate_subtitle_widget/translate_subtitle_widget.dart';
-import 'package:youtube_translation/services/translate_https.dart';
-import 'package:youtube_translation/utils/srt_split_util.dart';
+import 'package:youtube_translation/widgets/pop_up_dialog/pop_up_dialog.dart';
 
 class TranslatorScreen extends StatefulWidget {
   const TranslatorScreen({Key? key}) : super(key: key);
@@ -22,6 +21,8 @@ class TranslatorScreen extends StatefulWidget {
 
 class _TranslatorScreenState extends State<TranslatorScreen> {
   var lockKey = GlobalKey();
+  var langKey = GlobalKey();
+  var downloadSubKey = GlobalKey();
   late DropzoneViewController dropzoneViewController;
 
   @override
@@ -40,19 +41,10 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                    Stack(
+                      alignment: Alignment.center,
                       children: [
-                        const Opacity(
-                          opacity: 0,
-                          child: Padding(
-                            padding: EdgeInsets.fromLTRB(25, 5, 25, 5),
-                            child:
-                                Icon(Icons.menu, color: Colors.white, size: 28),
-                          ),
-                        ),
-                        Expanded(
-                            child: Column(
+                        Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             const Text(
@@ -68,17 +60,46 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
                                   color: Colors.grey.shade600, fontSize: 15),
                             ),
                           ],
-                        )),
-                        GestureDetector(
-                          behavior: HitTestBehavior.translucent,
-                          onTap: () {
-                            KeyInputDialog.showDialog(context, lockKey);
-                          },
-                          child: Padding(
-                            key: lockKey,
-                            padding: const EdgeInsets.fromLTRB(25, 5, 25, 5),
-                            child: const Icon(Icons.lock,
-                                color: Colors.white, size: 28),
+                        ),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              GestureDetector(
+                                behavior: HitTestBehavior.translucent,
+                                onTap: () {
+                                  PopUpDialog(PopUpWidgetType.changeLang).showDialog(context, targetKey: langKey);
+                                },
+                                child: Container(
+                                  key: langKey,
+                                  padding:
+                                      const EdgeInsets.fromLTRB(15, 5, 15, 5),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(30),
+                                      border: Border.all(
+                                          width: 1, color: Colors.white)),
+                                  child: Text(
+                                    'To ${OneTranslateModel.langName(tp.languageCode)}',
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                behavior: HitTestBehavior.translucent,
+                                onTap: () {
+                                  PopUpDialog(PopUpWidgetType.keyInput)
+                                      .showDialog(context, targetKey: lockKey);
+                                },
+                                child: Padding(
+                                  key: lockKey,
+                                  padding:
+                                      const EdgeInsets.fromLTRB(25, 5, 25, 5),
+                                  child: const Icon(Icons.key,
+                                      color: Colors.white, size: 28),
+                                ),
+                              ),
+                            ],
                           ),
                         )
                       ],

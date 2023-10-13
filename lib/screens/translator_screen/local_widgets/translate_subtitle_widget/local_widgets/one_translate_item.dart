@@ -42,12 +42,12 @@ class OneTranslateItem extends StatelessWidget {
                       height: 2,
                     ),
                     Text(
-                      oneTranslateModel.korean,
+                      oneTranslateModel.getLang(OneTranslateModel.original),
                       style: const TextStyle(color: Colors.white, fontSize: 14),
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      oneTranslateModel.english,
+                      oneTranslateModel.getLang(tp.languageCode),
                       style: const TextStyle(color: Colors.white, fontSize: 14),
                     ),
                   ],

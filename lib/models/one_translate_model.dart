@@ -1,36 +1,52 @@
 class OneTranslateModel {
+  static const String original = 'original';//원본
+  static const String ko = 'ko';//한국어
+  static const String en = 'en';//영어
+  static const String ja = 'ja';//일본어
+  static const String fr = 'fr';//프랑스어
+  static const String zh = 'zh';//중국어
+  static const String es = 'es';//스페인어
+
+  static String langName(String languageCode){
+    switch(languageCode){
+      case OneTranslateModel.original:
+        return 'Original';
+      case OneTranslateModel.ko:
+        return 'Korean';
+      case OneTranslateModel.en:
+        return 'English';
+      case OneTranslateModel.ja:
+        return 'Japanese';
+      case OneTranslateModel.fr:
+        return 'French';
+      case OneTranslateModel.zh:
+        return 'Chinese';
+      case OneTranslateModel.es:
+        return 'Spanish';
+    }
+    return '';
+  }
   OneTranslateModel({
     required this.order,
     required this.period,
-    required String korean,
-    required String english,
-  })  : _korean = korean,
-        _english = english;
+    required Map<String, String> translations
+  })  : _translations = translations;
+
+  final Map<String, String> _translations;
 
   final int order;
   final String period;
-  final String _korean;
 
-  String get korean {
+  String getLang(String languageCode) => _convert(_translations[languageCode]!);
+
+  String _convert(String text) {
     if (quotes) {
-      return '"$_korean"';
+      return '"$text"';
     }
     if (bracket) {
-      return '($_korean)';
+      return '($text)';
     }
-    return _korean;
-  }
-
-  final String _english;
-
-  String get english {
-    if (quotes) {
-      return '"$_english"';
-    }
-    if (bracket) {
-      return '($_english)';
-    }
-    return _english;
+    return text;
   }
 
   bool _quotes = false;

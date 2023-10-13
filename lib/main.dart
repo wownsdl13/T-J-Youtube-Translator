@@ -13,13 +13,14 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: MultiProvider(
-          providers: [
-            ChangeNotifierProvider(create: (_) => TranslatorProvider())
-          ],
-          child: const TranslatorScreen()),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => TranslatorProvider())
+      ],
+      child: const MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: TranslatorScreen(),
+      ),
     );
   }
 }
