@@ -44,7 +44,7 @@ class FloatBtn extends StatelessWidget {
                         if (states.contains(MaterialState.selected)) {
                           return const BorderSide(width: 1.2, color: Colors.transparent);
                         }
-                        return const BorderSide(width: 1.2, color: Colors.white);
+                        return BorderSide(width: 1.2, color: Colors.grey.shade700);
                       },
                     ),
                     onChanged: (check) {
@@ -57,9 +57,16 @@ class FloatBtn extends StatelessWidget {
               ),
             ),
             const Padding(
-              padding: EdgeInsets.fromLTRB(23, 5, 23, 10),
+              padding: EdgeInsets.fromLTRB(23, 7, 23, 10),
               child: Text(
                 'Download sub',
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(23, 10, 23, 10),
+              child: Text(
+                'Upload to Youtube',
                 style: TextStyle(color: Colors.white, fontSize: 16),
               ),
             ),
