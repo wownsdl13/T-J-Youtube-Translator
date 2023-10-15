@@ -85,9 +85,6 @@ class _TitleTranslateWidgetState extends State<TitleTranslateWidget> {
                 _translated(context)
               ],
             )),
-        const SizedBox(
-          width: 80,
-        )
       ],
     );
   }

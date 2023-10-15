@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:youtube_translation/models/one_translate_model.dart';
 import 'package:youtube_translation/services/dto/chat_gpt/gpt_response.dart';
-import 'package:youtube_translation/utils/chat_gpt_key.dart';
+import 'package:youtube_translation/utils/key_storage.dart';
 
 class TranslateHttps {
   static const _chatGPTUrl = 'https://api.openai.com/v1/chat/completions';
@@ -12,7 +12,7 @@ class TranslateHttps {
     var result = await http.post(Uri.parse(_chatGPTUrl),
         headers: {
           'Content-type': 'application/json; charset=utf-8',
-          'Authorization': 'Bearer ${await ChatGPTKey.getKey}'
+          'Authorization': 'Bearer ${await KeyStorage.getChatGptKey}'
         },
         body: jsonEncode({
           'model': 'gpt-4',

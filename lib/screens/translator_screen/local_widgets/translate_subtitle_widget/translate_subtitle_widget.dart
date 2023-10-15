@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dropzone/flutter_dropzone.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_translation/screens/translator_screen/local_utils/translator_provider.dart';
+import 'package:youtube_translation/screens/translator_screen/local_widgets/drag_drop.dart';
 import 'package:youtube_translation/screens/translator_screen/local_widgets/translate_subtitle_widget/local_widgets/one_translate_item.dart';
 
 class TranslateSubtitleWidget extends StatelessWidget {
@@ -47,17 +49,42 @@ class TranslateSubtitleWidget extends StatelessWidget {
                   border: Border.all(width: 1, color: Colors.white)),
               constraints: const BoxConstraints(maxWidth: 700),
               height: double.infinity,
-              child: ListView.builder(
-                padding: EdgeInsets.zero,
-                itemCount: tp.srtList.length,
-                itemBuilder: (context, index) =>
-                    OneTranslateItem(oneTranslateModel: tp.srtList[index]),
-              )),
-          const SizedBox(
-            width: 80,
-          )
+              child: _subtitles(context)),
         ],
       ),
+    );
+  }
+
+  Widget _subtitles(BuildContext context){
+    var tp = context.watch<TranslatorProvider>();
+    Widget w;
+    if(tp.srtList.isNotEmpty){
+      w = ListView.builder(
+        padding: EdgeInsets.zero,
+        itemCount: tp.srtList.length,
+        itemBuilder: (context, index) =>
+            OneTranslateItem(oneTranslateModel: tp.srtList[index]),
+      );
+    }else{
+      w =
+        Center(
+          child: Text(
+            "Drag your srt file here!",
+            style: TextStyle(
+                color: Colors.grey.shade600, fontSize: 16),
+          ),
+        );
+    }
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        w,
+        DragDrop(dragDropCallback:
+            (DropzoneViewController controller, htmlFile) async {
+          tp.readSrt(await controller.getFileData(htmlFile));
+        }),
+      ],
     );
   }
 }

@@ -7,10 +7,13 @@ import 'package:youtube_translation/models/one_translate_model.dart';
 import 'package:youtube_translation/screens/translator_screen/local_utils/translator_provider.dart';
 import 'package:youtube_translation/screens/translator_screen/local_widgets/description_translate_widget.dart';
 import 'package:youtube_translation/screens/translator_screen/local_widgets/drag_drop.dart';
-import 'package:youtube_translation/screens/translator_screen/local_widgets/float_btn.dart';
+import 'package:youtube_translation/screens/translator_screen/local_widgets/login_screen.dart';
+import 'package:youtube_translation/screens/translator_screen/local_widgets/upload_btn.dart';
 import 'package:youtube_translation/screens/translator_screen/local_widgets/title_translate_widget.dart';
 import 'package:youtube_translation/screens/translator_screen/local_widgets/translate_subtitle_widget/translate_subtitle_widget.dart';
 import 'package:youtube_translation/widgets/pop_up_dialog/pop_up_dialog.dart';
+
+import 'local_widgets/upload_file_widget/upload_file_widget.dart';
 
 class TranslatorScreen extends StatefulWidget {
   const TranslatorScreen({Key? key}) : super(key: key);
@@ -23,7 +26,14 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
   var lockKey = GlobalKey();
   var langKey = GlobalKey();
   var downloadSubKey = GlobalKey();
-  late DropzoneViewController dropzoneViewController;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    var tp = context.read<TranslatorProvider>();
+    tp.loginCheck();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,21 +54,16 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
                     Stack(
                       alignment: Alignment.center,
                       children: [
-                        Column(
+                        const Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Text(
-                              'T & J Youtube translator v.1.0.0',
+                            Text(
+                              'T & J Youtube uploader v.1.0.0',
                               textAlign: TextAlign.center,
                               style:
                                   TextStyle(color: Colors.white, fontSize: 20),
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              "drag your srt file here!",
-                              style: TextStyle(
-                                  color: Colors.grey.shade600, fontSize: 15),
-                            ),
+                            SizedBox(height: 4),
                           ],
                         ),
                         Align(
@@ -69,7 +74,8 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
                               GestureDetector(
                                 behavior: HitTestBehavior.translucent,
                                 onTap: () {
-                                  PopUpDialog(PopUpWidgetType.changeLang).showDialog(context, targetKey: langKey);
+                                  PopUpDialog(PopUpWidgetType.changeLang)
+                                      .showDialog(context, targetKey: langKey);
                                 },
                                 child: Container(
                                   key: langKey,
@@ -101,27 +107,61 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
                               ),
                             ],
                           ),
-                        )
+                        ),
                       ],
                     ),
-                    const SizedBox(height: 20),
-                    const TitleTranslateWidget(),
-                    const SizedBox(height: 50),
-                    const DescriptionTranslateWidget(),
-                    const SizedBox(height: 50),
-                    const Expanded(child: TranslateSubtitleWidget()),
-                    const SizedBox(height: 20),
+                    Expanded(
+                      child: Container(
+                        margin: const EdgeInsets.only(top: 40, bottom: 50),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Column(
+                              children: [
+                                TitleTranslateWidget(),
+                                SizedBox(height: 50),
+                                DescriptionTranslateWidget(),
+                                SizedBox(height: 50),
+                                Expanded(child: TranslateSubtitleWidget()),
+                              ],
+                            ),
+                            const SizedBox(width: 50),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                UploadFileWidget(
+                                    name: 'Video',
+                                    emptyText: 'Drag Video here',
+                                    size: const Size(250, 50),
+                                    hasValue: tp.hasVideo,
+                                    dragDropCallback: (DropzoneViewController controller, dynamic htmlFile) async{
+                                      tp.setVideo(name: await controller.getFilename(htmlFile), videoStream: controller.getFileStream(htmlFile));
+                                    },
+                                    child: Container()),
+                                const SizedBox(height: 50),
+                                UploadFileWidget(
+                                    name: 'Thumbnail',
+                                    emptyText: 'Drag Thumbnail here',
+                                    size: const Size(250, 250 * (720 / 1280)),
+                                    hasValue: tp.hasThumbnail,
+                                    dragDropCallback: (DropzoneViewController controller, dynamic htmlFile) async{
+                                      tp.setThumbnail = await controller.getFileData(htmlFile);
+                                    },
+                                    child: Image.memory(tp.thumbnail, fit: BoxFit.cover)),
+                                const upload_btn(),
+                                const SizedBox(height: 30),
+                              ],
+                            ),
+                            const SizedBox(width: 50),
+                          ],
+                        ),
+                      ),
+                    )
                   ],
                 ),
               ),
-              const Align(alignment: Alignment.bottomRight, child: FloatBtn()),
-              const Positioned.fill(child: DragDrop()),
-              IgnorePointer(
-                ignoring: true,
-                child: Container(
-                  color: tp.dragDropState ? Colors.blue.withOpacity(.3) : null,
-                ),
-              )
+              // const Align(alignment: Alignment.bottomRight, child: FloatBtn()),
+              if (!tp.isLogin) const LoginScreen()
             ],
           );
         },

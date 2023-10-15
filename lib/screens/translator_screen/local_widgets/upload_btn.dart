@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_translation/screens/translator_screen/local_utils/translator_provider.dart';
 
-class FloatBtn extends StatelessWidget {
-  const FloatBtn({Key? key}) : super(key: key);
+class upload_btn extends StatelessWidget {
+  const upload_btn({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,10 +14,11 @@ class FloatBtn extends StatelessWidget {
         // tp.download();
       },
       child: Container(
-        margin: const EdgeInsets.fromLTRB(0, 0, 5, 25),
+        margin: const EdgeInsets.only(top: 50),
+        width: 250,
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(23, 10, 17, 5),
@@ -56,18 +57,21 @@ class FloatBtn extends StatelessWidget {
                 ],
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.fromLTRB(23, 7, 23, 10),
-              child: Text(
+            Container(
+              padding: const EdgeInsets.fromLTRB(23, 10, 23, 10),
+              decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.white), borderRadius: BorderRadius.circular(8)),
+              child: const Text(
                 'Download sub',
                 style: TextStyle(color: Colors.white, fontSize: 16),
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.fromLTRB(23, 10, 23, 10),
-              child: Text(
+            const SizedBox(height: 30),
+            Container(
+              padding: const EdgeInsets.fromLTRB(30, 13, 30, 13),
+              decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.white), borderRadius: BorderRadius.circular(8)),
+              child: const Text(
                 'Upload to Youtube',
-                style: TextStyle(color: Colors.white, fontSize: 16),
+                style: TextStyle(color: Colors.white, fontSize: 18),
               ),
             ),
           ],

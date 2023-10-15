@@ -73,7 +73,6 @@ class _DescriptionTranslateWidgetState extends State<DescriptionTranslateWidget>
                 _translated(context)
               ],
             )),
-        const SizedBox(width: 80)
       ],);
   }
 
