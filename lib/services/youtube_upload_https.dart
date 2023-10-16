@@ -3,15 +3,19 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
+
+typedef UploadProgressCallback = Function(double percentage);
 class YoutubeUploadHttps{
+  YoutubeUploadHttps(this.oAuthToken);
+  final String oAuthToken;
   static const apiKey = 'AIzaSyA1ki2kqdDAzrQwpn2GTZ-NiM6rYkxpPWc';
-  static const oAuthToken = 'YOUR_OAUTH2_TOKEN';
   static const chunkSize = 262144;  // 256KB, 청크 크기는 변경 가능합니다.
 
 
-  Future<String> uploadVideo(Stream<List<int>> videoStream, int getFileSize, List<String> tags) async {
+
+  Future<String> uploadVideo(Stream<List<int>> videoStream, int getFileSize, List<String> tags, {required UploadProgressCallback uploadProgressCallback}) async {
     // 1. 영상 초기화 및 메타데이터 설정
-    final initUploadUrl = 'https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status';
+    const initUploadUrl = 'https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status';
     final initResponse = await http.post(
       Uri.parse(initUploadUrl),
       headers: {
@@ -31,15 +35,14 @@ class YoutubeUploadHttps{
         },
       }),
     );
-
     final uploadUrl = initResponse.headers['location']!;
 
     // 2. 청크 단위로 영상 업로드
     int chunkSize = 1024 * 1024; // 예: 1MB
     List<int> buffer = [];
+    int uploadedBytes = 0; // 현재까지 업로드된 바이트 수
     await for (List<int> data in videoStream) {
       buffer.addAll(data);
-
       while (buffer.length >= chunkSize) {
         final chunk = buffer.sublist(0, chunkSize);
         await http.put(
@@ -47,13 +50,16 @@ class YoutubeUploadHttps{
           headers: {
             'Authorization': 'Bearer $oAuthToken',
             'Content-Type': 'video/*',
+            'Content-Length': '${getFileSize - uploadedBytes}',
             // 청크의 크기와 전체 크기를 설정합니다.
-            'Content-Range': 'bytes 0-${chunk.length-1}/${buffer.length}',
+            'Content-Range': 'bytes $uploadedBytes-${uploadedBytes + chunk.length-1}/$getFileSize',
           },
           body: chunk,
         );
 
+        uploadedBytes += chunk.length;
         buffer = buffer.sublist(chunkSize); // 버퍼에서 청크를 제거
+        uploadProgressCallback(uploadedBytes/getFileSize);
       }
     }
 
@@ -64,10 +70,12 @@ class YoutubeUploadHttps{
         headers: {
           'Authorization': 'Bearer $oAuthToken',
           'Content-Type': 'video/*',
-          'Content-Range': 'bytes 0-${buffer.length-1}/${buffer.length}',
+          'Content-Length': '${buffer.length}',
+          'Content-Range': 'bytes $uploadedBytes-${uploadedBytes + buffer.length-1}/$getFileSize',
         },
         body: buffer,
       );
+      uploadProgressCallback(1);
     }
 
     final videoId = jsonDecode(initResponse.body)['id'];
@@ -89,7 +97,7 @@ class YoutubeUploadHttps{
     };
    */
   Future<void> setVideoLocalizations(String videoId, Map<String, Map<String, String>> localizations) async {
-    final metadataUrl = 'https://www.googleapis.com/youtube/v3/videos?part=localizations&key=$apiKey';
+    const metadataUrl = 'https://www.googleapis.com/youtube/v3/videos?part=localizations&key=$apiKey';
     await http.put(
       Uri.parse(metadataUrl),
       headers: {
@@ -104,7 +112,7 @@ class YoutubeUploadHttps{
   }
 
 
-  Future<void> setThumbnail(String videoId, File thumbnailFile) async {
+  Future<void> setThumbnail(String videoId, Uint8List thumbnail) async {
     final url = 'https://www.googleapis.com/upload/youtube/v3/thumbnails/set?videoId=$videoId&key=$apiKey';
 
     final response = await http.post(
@@ -113,7 +121,7 @@ class YoutubeUploadHttps{
         'Authorization': 'Bearer $oAuthToken',
         'Content-Type': 'image/jpeg',
       },
-      body: thumbnailFile.readAsBytesSync(),
+      body: thumbnail,
     );
 
     if (response.statusCode != 200) {
@@ -121,14 +129,17 @@ class YoutubeUploadHttps{
     }
   }
 
-  Future<void> addCaption(String videoId, File srtFile, String language) async {
-    final url = 'https://www.googleapis.com/upload/youtube/v3/captions?part=snippet&key=$apiKey';
+  Future<void> addCaption(String videoId, String srt, String language) async {
+    const url = 'https://www.googleapis.com/upload/youtube/v3/captions?part=snippet';
 
+    // 1. 캡션 리소스 생성
     final response = await http.post(
       Uri.parse(url),
       headers: {
         'Authorization': 'Bearer $oAuthToken',
         'Content-Type': 'application/json',
+        'X-Upload-Content-Type': 'application/octet-stream',
+        'X-Upload-Content-Length': '${srt.length}',
       },
       body: jsonEncode({
         'snippet': {
@@ -140,7 +151,22 @@ class YoutubeUploadHttps{
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to add caption');
+      throw Exception('Failed to initiate caption upload');
+    }
+
+    // 2. 자막 파일 업로드
+    final uploadUrl = response.headers['location']!;
+    final uploadResponse = await http.post(
+      Uri.parse(uploadUrl),
+      headers: {
+        'Authorization': 'Bearer $oAuthToken',
+        'Content-Type': 'application/octet-stream',
+      },
+      body: srt,
+    );
+
+    if (uploadResponse.statusCode != 200) {
+      throw Exception('Failed to upload caption file');
     }
   }
 }

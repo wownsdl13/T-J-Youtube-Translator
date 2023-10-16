@@ -43,11 +43,14 @@ class UploadFileWidget extends StatelessWidget {
                 border: Border.all(width: 1, color: Colors.white)),
             width: size.width,
             height: size.height,
-            child: Stack(
-              children: [
-                _screen,
-                DragDrop(dragDropCallback: dragDropCallback)
-              ],
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Stack(
+                children: [
+                  _screen,
+                  DragDrop(dragDropCallback: dragDropCallback)
+                ],
+              ),
             )),
       ],
     );

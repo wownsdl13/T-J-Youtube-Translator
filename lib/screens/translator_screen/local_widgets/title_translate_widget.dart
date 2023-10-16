@@ -21,12 +21,27 @@ class _TitleTranslateWidgetState extends State<TitleTranslateWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          constraints: const BoxConstraints(minWidth: 100),
+          constraints: const BoxConstraints(minWidth: 115),
           padding: const EdgeInsets.only(top: 13),
-          child: const Text(
-            'Title : ',
-            textAlign: TextAlign.end,
-            style: TextStyle(color: Colors.white, fontSize: 18),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              if (tp.translatingTitle)
+                const SizedBox(
+                    width: 10,
+                    height: 10,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    )),
+              const SizedBox(width: 3),
+              const Text(
+                'Title : ',
+                textAlign: TextAlign.end,
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
+            ],
           ),
         ),
         const SizedBox(

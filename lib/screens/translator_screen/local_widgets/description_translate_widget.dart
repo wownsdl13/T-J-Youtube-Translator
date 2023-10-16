@@ -21,11 +21,28 @@ class _DescriptionTranslateWidgetState extends State<DescriptionTranslateWidget>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          constraints: const BoxConstraints(
-              minWidth: 100
-          ),
+          constraints: const BoxConstraints(minWidth: 115),
           padding: const EdgeInsets.only(top: 13),
-          child: const Text('Description : ', textAlign: TextAlign.end, style: TextStyle(color: Colors.white, fontSize: 18),),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              if (tp.translatingDescription)
+                const SizedBox(
+                    width: 10,
+                    height: 10,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    )),
+              const SizedBox(width: 3),
+              const Text(
+                'Description : ',
+                textAlign: TextAlign.end,
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
+            ],
+          ),
         ),
         const SizedBox(width: 10),
         Container(
@@ -43,6 +60,7 @@ class _DescriptionTranslateWidgetState extends State<DescriptionTranslateWidget>
                           controller: textEditingController,
                           maxLines: null,
                           cursorColor: Colors.grey.shade400,
+                          style: const TextStyle(color: Colors.white),
                           decoration: InputDecoration(border: InputBorder.none, hintStyle: TextStyle(color: Colors.grey.shade700), hintText: 'Input youtube description'),),
                       ),
                       GestureDetector(

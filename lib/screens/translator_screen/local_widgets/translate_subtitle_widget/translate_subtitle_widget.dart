@@ -18,12 +18,13 @@ class TranslateSubtitleWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            constraints: const BoxConstraints(minWidth: 100),
+            constraints: const BoxConstraints(minWidth: 115),
             padding: const EdgeInsets.only(top: 13),
             child: Row(
               mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                if (tp.reading)
+                if (tp.readingSrt)
                   const SizedBox(
                       width: 10,
                       height: 10,
@@ -63,7 +64,9 @@ class TranslateSubtitleWidget extends StatelessWidget {
         padding: EdgeInsets.zero,
         itemCount: tp.srtList.length,
         itemBuilder: (context, index) =>
-            OneTranslateItem(oneTranslateModel: tp.srtList[index]),
+            OneTranslateItem(
+                key: ValueKey('$index-${tp.languageCode}'),
+                oneTranslateModel: tp.srtList[index], translatedText: tp.srtList[index].getLang(tp.languageCode)),
       );
     }else{
       w =

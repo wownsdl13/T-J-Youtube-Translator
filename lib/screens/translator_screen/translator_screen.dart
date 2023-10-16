@@ -7,10 +7,14 @@ import 'package:youtube_translation/models/one_translate_model.dart';
 import 'package:youtube_translation/screens/translator_screen/local_utils/translator_provider.dart';
 import 'package:youtube_translation/screens/translator_screen/local_widgets/description_translate_widget.dart';
 import 'package:youtube_translation/screens/translator_screen/local_widgets/drag_drop.dart';
+import 'package:youtube_translation/screens/translator_screen/local_widgets/description_header_widget.dart';
+import 'package:youtube_translation/screens/translator_screen/local_widgets/title_header_widget.dart';
 import 'package:youtube_translation/screens/translator_screen/local_widgets/login_screen.dart';
+import 'package:youtube_translation/screens/translator_screen/local_widgets/tag_widget.dart';
 import 'package:youtube_translation/screens/translator_screen/local_widgets/upload_btn.dart';
 import 'package:youtube_translation/screens/translator_screen/local_widgets/title_translate_widget.dart';
 import 'package:youtube_translation/screens/translator_screen/local_widgets/translate_subtitle_widget/translate_subtitle_widget.dart';
+import 'package:youtube_translation/screens/translator_screen/local_widgets/uploading_widget.dart';
 import 'package:youtube_translation/widgets/pop_up_dialog/pop_up_dialog.dart';
 
 import 'local_widgets/upload_file_widget/upload_file_widget.dart';
@@ -134,22 +138,54 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
                                     emptyText: 'Drag Video here',
                                     size: const Size(250, 50),
                                     hasValue: tp.hasVideo,
-                                    dragDropCallback: (DropzoneViewController controller, dynamic htmlFile) async{
-                                      tp.setVideo(name: await controller.getFilename(htmlFile), videoStream: controller.getFileStream(htmlFile));
+                                    dragDropCallback:
+                                        (DropzoneViewController controller,
+                                            dynamic htmlFile) async {
+                                      tp.setVideo(
+                                          size: await controller
+                                              .getFileSize(htmlFile),
+                                          mime: await controller
+                                              .getFileMIME(htmlFile),
+                                          name: await controller
+                                              .getFilename(htmlFile),
+                                          videoStream: controller
+                                              .getFileStream(htmlFile));
                                     },
-                                    child: Container()),
+                                    child: tp.hasVideo
+                                        ? Center(
+                                            child: Text(
+                                            tp.videoName,
+                                            style: TextStyle(
+                                                color: Colors.green.shade300,
+                                                fontSize: 16),
+                                          ))
+                                        : Container()),
                                 const SizedBox(height: 50),
                                 UploadFileWidget(
                                     name: 'Thumbnail',
                                     emptyText: 'Drag Thumbnail here',
                                     size: const Size(250, 250 * (720 / 1280)),
                                     hasValue: tp.hasThumbnail,
-                                    dragDropCallback: (DropzoneViewController controller, dynamic htmlFile) async{
-                                      tp.setThumbnail = await controller.getFileData(htmlFile);
+                                    dragDropCallback:
+                                        (DropzoneViewController controller,
+                                            dynamic htmlFile) async {
+                                      tp.setThumbnail(
+                                          await controller
+                                              .getFileMIME(htmlFile),
+                                          await controller
+                                              .getFileData(htmlFile));
                                     },
-                                    child: Image.memory(tp.thumbnail, fit: BoxFit.cover)),
-                                const upload_btn(),
+                                    child: tp.hasThumbnail
+                                        ? Image.memory(tp.thumbnail,
+                                            fit: BoxFit.cover)
+                                        : Container()),
+                                const SizedBox(height: 50),
+                                const TitleHeaderWidget(),
                                 const SizedBox(height: 30),
+                                const DescriptionHeaderWidget(),
+                                const SizedBox(height: 50),
+                                const TagWidget(),
+                                const UploadBtn(),
                               ],
                             ),
                             const SizedBox(width: 50),
@@ -160,8 +196,8 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
                   ],
                 ),
               ),
-              // const Align(alignment: Alignment.bottomRight, child: FloatBtn()),
-              if (!tp.isLogin) const LoginScreen()
+              const UploadingWidget()
+              // if (!tp.isLogin) const LoginScreen()
             ],
           );
         },

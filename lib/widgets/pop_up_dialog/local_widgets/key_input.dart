@@ -16,17 +16,17 @@ class _KeyInputState extends State<KeyInput> {
   @override
   void initState() {
     // TODO: implement initState
-    KeyStorage.getChatGptKey.then((value){
+    KeyStorage.getKey(KeyStorage.chatGptKey).then((value){
       gptController.text = value ??= '';
     });
-    KeyStorage.getYoutubeApiKey.then((value){
+    KeyStorage.getKey(KeyStorage.youtubeApiKey).then((value){
       youtubeController.text = value ??= '';
     });
     gptController.addListener(() async{
-      await KeyStorage.setChatGptKey(gptController.text);
+      await KeyStorage.setKey(KeyStorage.chatGptKey, gptController.text);
     });
     youtubeController.addListener(() async{
-      await KeyStorage.setYoutubeApiKey(youtubeController.text);
+      await KeyStorage.setKey(KeyStorage.youtubeApiKey, youtubeController.text);
     });
     super.initState();
   }

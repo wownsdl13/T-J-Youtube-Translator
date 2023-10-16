@@ -7,6 +7,8 @@ class OneTranslateModel {
   static const String zh = 'zh';//중국어
   static const String es = 'es';//스페인어
 
+  static List<String> get langList => [ko, en, ja, fr, zh, es];
+
   static String langName(String languageCode){
     switch(languageCode){
       case OneTranslateModel.original:
@@ -37,7 +39,17 @@ class OneTranslateModel {
   final int order;
   final String period;
 
-  String getLang(String languageCode) => _convert(_translations[languageCode]!);
+  void setLang(String languageCode, String text){
+    _translations[languageCode] = text;
+  }
+
+  String getLang(String languageCode, {bool addQuotesAndBracket = false}){
+    if(addQuotesAndBracket){
+      return _convert(_translations[languageCode]!);
+    }else{
+      return _translations[languageCode]!;
+    }
+  }
 
   String _convert(String text) {
     if (quotes) {

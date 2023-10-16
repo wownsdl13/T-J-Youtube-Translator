@@ -12,7 +12,7 @@ class TranslateHttps {
     var result = await http.post(Uri.parse(_chatGPTUrl),
         headers: {
           'Content-type': 'application/json; charset=utf-8',
-          'Authorization': 'Bearer ${await KeyStorage.getChatGptKey}'
+          'Authorization': 'Bearer ${await KeyStorage.getKey(KeyStorage.chatGptKey)}'
         },
         body: jsonEncode({
           'model': 'gpt-4',
@@ -33,6 +33,7 @@ class TranslateHttps {
           "temperature": 0,
           'max_tokens': 2000
         }));
+    print('result > ${result.body}');
     var gpt = GptResponse.fromJson(jsonDecode(utf8.decode(result.bodyBytes)));
     return (jsonDecode(gpt.text) as Map).map((key, value) => MapEntry(key.toString(), value.toString()))..[OneTranslateModel.original] = srtTxt;
   }

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_translation/screens/translator_screen/local_utils/translator_provider.dart';
 
-class upload_btn extends StatelessWidget {
-  const upload_btn({Key? key}) : super(key: key);
+class UploadBtn extends StatelessWidget {
+  const UploadBtn({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +14,7 @@ class upload_btn extends StatelessWidget {
         // tp.download();
       },
       child: Container(
-        margin: const EdgeInsets.only(top: 50),
+        margin: const EdgeInsets.only(top: 20),
         width: 250,
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -57,22 +57,46 @@ class upload_btn extends StatelessWidget {
                 ],
               ),
             ),
-            Container(
-              padding: const EdgeInsets.fromLTRB(23, 10, 23, 10),
-              decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.white), borderRadius: BorderRadius.circular(8)),
-              child: const Text(
-                'Download sub',
-                style: TextStyle(color: Colors.white, fontSize: 16),
+            GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: (){
+                tp.uploadTest();
+              },
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(23, 10, 23, 10),
+                decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.white), borderRadius: BorderRadius.circular(8)),
+                child: const Text(
+                  'Download sub',
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
               ),
             ),
             const SizedBox(height: 30),
-            Container(
-              padding: const EdgeInsets.fromLTRB(30, 13, 30, 13),
-              decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.white), borderRadius: BorderRadius.circular(8)),
-              child: const Text(
-                'Upload to Youtube',
-                style: TextStyle(color: Colors.white, fontSize: 18),
-              ),
+            FutureBuilder(
+              future: tp.readyToUpload,
+              builder: (context, snapshot) {
+                var ready = snapshot.hasData && (snapshot.data ?? false);
+                return IgnorePointer(
+                  ignoring: !ready,
+                  child: Opacity(
+                    opacity: ready?1:.3,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.translucent,
+                      onTap: (){
+                        tp.upload();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.fromLTRB(30, 13, 30, 13),
+                        decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.white), borderRadius: BorderRadius.circular(8)),
+                        child: const Text(
+                          'Upload to Youtube',
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }
             ),
           ],
         ),
