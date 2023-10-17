@@ -196,8 +196,8 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
                   ],
                 ),
               ),
-              const UploadingWidget()
-              // if (!tp.isLogin) const LoginScreen()
+              const UploadingWidget(),
+              if (!tp.isLogin) const LoginScreen()
             ],
           );
         },

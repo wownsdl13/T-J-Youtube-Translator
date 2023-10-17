@@ -13,7 +13,7 @@ class YoutubeUploadHttps{
 
 
 
-  Future<String> uploadVideo(Stream<List<int>> videoStream, int getFileSize, List<String> tags, {required UploadProgressCallback uploadProgressCallback}) async {
+  Future<String?> uploadVideo(Stream<List<int>> videoStream, int getFileSize, List<String> tags, {required UploadProgressCallback uploadProgressCallback}) async {
     // 1. 영상 초기화 및 메타데이터 설정
     const initUploadUrl = 'https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status';
     final initResponse = await http.post(
@@ -29,6 +29,7 @@ class YoutubeUploadHttps{
           'title': '',
           'description': '',
           'tags': tags,
+          'defaultLanguage': 'en',
         },
         'status': {
           'privacyStatus': 'private',
@@ -65,7 +66,7 @@ class YoutubeUploadHttps{
 
     // 마지막 청크 처리 (버퍼에 남아 있는 데이터)
     if (buffer.isNotEmpty) {
-      await http.put(
+      var finalResponse = await http.put(
         Uri.parse(uploadUrl),
         headers: {
           'Authorization': 'Bearer $oAuthToken',
@@ -76,10 +77,15 @@ class YoutubeUploadHttps{
         body: buffer,
       );
       uploadProgressCallback(1);
+      try {
+        var responseJson = jsonDecode(finalResponse.body);
+        final videoId = responseJson['id'];
+        return videoId;
+      } catch (e) {
+        throw Exception('Failed to parse response JSON. Error: $e');
+      }
     }
-
-    final videoId = jsonDecode(initResponse.body)['id'];
-    return videoId;
+    return null;
   }
 
 
@@ -98,7 +104,7 @@ class YoutubeUploadHttps{
    */
   Future<void> setVideoLocalizations(String videoId, Map<String, Map<String, String>> localizations) async {
     const metadataUrl = 'https://www.googleapis.com/youtube/v3/videos?part=localizations&key=$apiKey';
-    await http.put(
+    var result = await http.put(
       Uri.parse(metadataUrl),
       headers: {
         'Authorization': 'Bearer $oAuthToken',
@@ -109,6 +115,7 @@ class YoutubeUploadHttps{
         'localizations': localizations,
       }),
     );
+    print('>> ${result.body}, >> ${result.statusCode}');
   }
 
 

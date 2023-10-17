@@ -60,7 +60,7 @@ class UploadBtn extends StatelessWidget {
             GestureDetector(
               behavior: HitTestBehavior.translucent,
               onTap: (){
-                tp.uploadTest();
+                tp.download();
               },
               child: Container(
                 padding: const EdgeInsets.fromLTRB(23, 10, 23, 10),
@@ -77,7 +77,8 @@ class UploadBtn extends StatelessWidget {
               builder: (context, snapshot) {
                 var ready = snapshot.hasData && (snapshot.data ?? false);
                 return IgnorePointer(
-                  ignoring: !ready,
+                  ignoring: false,
+                  // ignoring: !ready,
                   child: Opacity(
                     opacity: ready?1:.3,
                     child: GestureDetector(

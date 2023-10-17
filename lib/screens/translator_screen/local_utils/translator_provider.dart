@@ -9,89 +9,12 @@ import 'package:youtube_translation/services/translate_https.dart';
 import 'package:youtube_translation/services/youtube_upload_https.dart';
 import 'package:youtube_translation/utils/key_storage.dart';
 import 'dart:convert';
+import 'package:http/http.dart' as temp;
 
 import 'package:youtube_translation/utils/srt_split_util.dart';
 
 class TranslatorProvider extends ChangeNotifier {
-  final srtList = <OneTranslateModel>[
-    OneTranslateModel(order: 1, period: '011 -> 022', translations: [OneTranslateModel.original, ...OneTranslateModel.langList].fold<Map<String, String>>({}, (previousValue, element){
-      previousValue[element] = 'this is test!';
-      return previousValue;
-    })),
-    OneTranslateModel(order: 1, period: '011 -> 022', translations: [OneTranslateModel.original, ...OneTranslateModel.langList].fold<Map<String, String>>({}, (previousValue, element){
-      previousValue[element] = 'this is test!';
-      return previousValue;
-    })),OneTranslateModel(order: 1, period: '011 -> 022', translations: [OneTranslateModel.original, ...OneTranslateModel.langList].fold<Map<String, String>>({}, (previousValue, element){
-      previousValue[element] = 'this is test!';
-      return previousValue;
-    })),OneTranslateModel(order: 1, period: '011 -> 022', translations: [OneTranslateModel.original, ...OneTranslateModel.langList].fold<Map<String, String>>({}, (previousValue, element){
-      previousValue[element] = 'this is test!';
-      return previousValue;
-    })),OneTranslateModel(order: 1, period: '011 -> 022', translations: [OneTranslateModel.original, ...OneTranslateModel.langList].fold<Map<String, String>>({}, (previousValue, element){
-      previousValue[element] = 'this is test!';
-      return previousValue;
-    })),OneTranslateModel(order: 1, period: '011 -> 022', translations: [OneTranslateModel.original, ...OneTranslateModel.langList].fold<Map<String, String>>({}, (previousValue, element){
-      previousValue[element] = 'this is test!';
-      return previousValue;
-    })),OneTranslateModel(order: 1, period: '011 -> 022', translations: [OneTranslateModel.original, ...OneTranslateModel.langList].fold<Map<String, String>>({}, (previousValue, element){
-      previousValue[element] = 'this is test!';
-      return previousValue;
-    })),OneTranslateModel(order: 1, period: '011 -> 022', translations: [OneTranslateModel.original, ...OneTranslateModel.langList].fold<Map<String, String>>({}, (previousValue, element){
-      previousValue[element] = 'this is test!';
-      return previousValue;
-    })),OneTranslateModel(order: 1, period: '011 -> 022', translations: [OneTranslateModel.original, ...OneTranslateModel.langList].fold<Map<String, String>>({}, (previousValue, element){
-      previousValue[element] = 'this is test!';
-      return previousValue;
-    })),OneTranslateModel(order: 1, period: '011 -> 022', translations: [OneTranslateModel.original, ...OneTranslateModel.langList].fold<Map<String, String>>({}, (previousValue, element){
-      previousValue[element] = 'this is test!';
-      return previousValue;
-    })),OneTranslateModel(order: 1, period: '011 -> 022', translations: [OneTranslateModel.original, ...OneTranslateModel.langList].fold<Map<String, String>>({}, (previousValue, element){
-      previousValue[element] = 'this is test!';
-      return previousValue;
-    })),OneTranslateModel(order: 1, period: '011 -> 022', translations: [OneTranslateModel.original, ...OneTranslateModel.langList].fold<Map<String, String>>({}, (previousValue, element){
-      previousValue[element] = 'this is test!';
-      return previousValue;
-    })),OneTranslateModel(order: 1, period: '011 -> 022', translations: [OneTranslateModel.original, ...OneTranslateModel.langList].fold<Map<String, String>>({}, (previousValue, element){
-      previousValue[element] = 'this is test!';
-      return previousValue;
-    })),OneTranslateModel(order: 1, period: '011 -> 022', translations: [OneTranslateModel.original, ...OneTranslateModel.langList].fold<Map<String, String>>({}, (previousValue, element){
-      previousValue[element] = 'this is test!';
-      return previousValue;
-    })),OneTranslateModel(order: 1, period: '011 -> 022', translations: [OneTranslateModel.original, ...OneTranslateModel.langList].fold<Map<String, String>>({}, (previousValue, element){
-      previousValue[element] = 'this is test!';
-      return previousValue;
-    })),
-
-    OneTranslateModel(order: 1, period: '011 -> 022', translations: [OneTranslateModel.original, ...OneTranslateModel.langList].fold<Map<String, String>>({}, (previousValue, element){
-      previousValue[element] = 'this is test!';
-      return previousValue;
-    })),
-    OneTranslateModel(order: 1, period: '011 -> 022', translations: [OneTranslateModel.original, ...OneTranslateModel.langList].fold<Map<String, String>>({}, (previousValue, element){
-      previousValue[element] = 'this is test!';
-      return previousValue;
-    })),OneTranslateModel(order: 1, period: '011 -> 022', translations: [OneTranslateModel.original, ...OneTranslateModel.langList].fold<Map<String, String>>({}, (previousValue, element){
-      previousValue[element] = 'this is test!';
-      return previousValue;
-    })),OneTranslateModel(order: 1, period: '011 -> 022', translations: [OneTranslateModel.original, ...OneTranslateModel.langList].fold<Map<String, String>>({}, (previousValue, element){
-      previousValue[element] = 'this is test!';
-      return previousValue;
-    })),OneTranslateModel(order: 1, period: '011 -> 022', translations: [OneTranslateModel.original, ...OneTranslateModel.langList].fold<Map<String, String>>({}, (previousValue, element){
-      previousValue[element] = 'this is test!';
-      return previousValue;
-    })),OneTranslateModel(order: 1, period: '011 -> 022', translations: [OneTranslateModel.original, ...OneTranslateModel.langList].fold<Map<String, String>>({}, (previousValue, element){
-      previousValue[element] = 'this is test!';
-      return previousValue;
-    })),OneTranslateModel(order: 1, period: '011 -> 022', translations: [OneTranslateModel.original, ...OneTranslateModel.langList].fold<Map<String, String>>({}, (previousValue, element){
-      previousValue[element] = 'this is test!';
-      return previousValue;
-    })),OneTranslateModel(order: 1, period: '011 -> 022', translations: [OneTranslateModel.original, ...OneTranslateModel.langList].fold<Map<String, String>>({}, (previousValue, element){
-      previousValue[element] = 'this is test!';
-      return previousValue;
-    })),OneTranslateModel(order: 1, period: '011 -> 022', translations: [OneTranslateModel.original, ...OneTranslateModel.langList].fold<Map<String, String>>({}, (previousValue, element){
-      previousValue[element] = 'this is test!';
-      return previousValue;
-    })),
-  ];
+  final srtList = <OneTranslateModel>[];
   final tags = <String>[];
 
   set setTags(List<String> tags) {
@@ -183,7 +106,6 @@ class TranslatorProvider extends ChangeNotifier {
           translations: lang,
         ));
         notifyListeners();
-        break;
       }
       _readingSrt = false;
       notifyListeners();
@@ -295,7 +217,7 @@ class TranslatorProvider extends ChangeNotifier {
   final _googleSignIn = GoogleSignIn(scopes: [
     'https://www.googleapis.com/auth/youtube.upload',
     'https://www.googleapis.com/auth/youtube.force-ssl',
-  ]);
+  ], clientId: '133538713387-d4jnbid8v4v1tl6p7f4v29afpdns94tl.apps.googleusercontent.com');
   GoogleSignInAccount? _googleId;
 
   bool get isLogin => _googleId != null;
@@ -338,47 +260,70 @@ class TranslatorProvider extends ChangeNotifier {
   }
 
   Future upload() async {
-    if (isLogin && hasVideo) {
+    // if (isLogin && hasVideo) {
       var oAuthToken = (await _googleId!.authentication).accessToken;
       if (oAuthToken != null) {
         _uploadPercentage = UploadPercentageModel('uploading video');
         notifyListeners();
-        var videoId = await YoutubeUploadHttps(oAuthToken).uploadVideo(
-            _videoUploadModel!.videoStream, _videoUploadModel!.size, tags, uploadProgressCallback: (double percentage) {
-              var p = (percentage * 100).floor();
-              _uploadPercentage!.setPercentage = p;
-              notifyListeners();
-        });
-        oAuthToken = (await _googleId!.authentication).accessToken;
-        if (oAuthToken != null) {
-          _uploadPercentage!.setText = 'uploading thumbnail';
-          notifyListeners();
-          var youtubeUploadHttps = YoutubeUploadHttps(oAuthToken);
-          await youtubeUploadHttps.setThumbnail(videoId, thumbnail);
-          var localizations = <String, Map<String, String>>{};
-          if (_translatedTitle != null && _translatedDescription != null) {
-            for (var lang in OneTranslateModel.langList) {
-              localizations[lang] = {
-                'title': _translatedTitle![lang]!,
-                'description': _translatedDescription![lang]!,
-              };
-            }
-          }
-          _uploadPercentage!.setText = 'uploading title and description';
-          notifyListeners();
-          await youtubeUploadHttps.setVideoLocalizations(
-              videoId, localizations);
-          if (srtList.isNotEmpty) {
-            _uploadPercentage!.setText = 'uploading captions';
+        var videoId = '49D4RtnkTl0';
+        // var videoId = await YoutubeUploadHttps(oAuthToken).uploadVideo(
+        //     _videoUploadModel!.videoStream, _videoUploadModel!.size, tags,
+        //     uploadProgressCallback: (double percentage) {
+        //       var p = (percentage * 100).floor();
+        //       _uploadPercentage!.setPercentage = p;
+        //       notifyListeners();
+        //     });
+        if (videoId != null) {
+          oAuthToken = (await _googleId!.authentication).accessToken;
+          if (oAuthToken != null) {
+            _uploadPercentage!.setText = 'uploading thumbnail';
             notifyListeners();
-            for (var lang in OneTranslateModel.langList) {
-              await youtubeUploadHttps.addCaption(
-                  videoId, _generateSrt(lang), lang);
+            var youtubeUploadHttps = YoutubeUploadHttps(oAuthToken);
+            // await youtubeUploadHttps.setThumbnail(videoId, thumbnail);
+            var localizations = <String, Map<String, String>>{};
+
+            String titleHeader = '';
+            if (await KeyStorage.hasKey(KeyStorage.titleHeader) &&
+                (await KeyStorage.getKey(KeyStorage.titleHeader))!.trim()
+                    .isNotEmpty) {
+              titleHeader =
+              '${await KeyStorage.getKey(KeyStorage.titleHeader)} ';
+            }
+            String descriptionHeader = '';
+            if (await KeyStorage.hasKey(KeyStorage.descriptionHeader) &&
+                (await KeyStorage.getKey(KeyStorage.descriptionHeader))!.trim()
+                    .isNotEmpty) {
+              descriptionHeader =
+              '${await KeyStorage.getKey(KeyStorage.descriptionHeader)}\n\n';
+            }
+
+            print('..11');
+            // if (_translatedTitle != null && _translatedDescription != null) {
+            //   for (var lang in OneTranslateModel.langList) {
+            //     print('..22 > $lang');
+            //     localizations[lang] = {
+            //       'title': '$titleHeader${_translatedTitle![lang]!}',
+            //       'description': descriptionHeader +
+            //           _translatedDescription![lang]!,
+            //     };
+            //   }
+            // }
+            _uploadPercentage!.setText = 'uploading title and description';
+            notifyListeners();
+            await youtubeUploadHttps.setVideoLocalizations(
+                videoId, localizations);
+            if (srtList.isNotEmpty) {
+              _uploadPercentage!.setText = 'uploading captions';
+              notifyListeners();
+              for (var lang in OneTranslateModel.langList) {
+                await youtubeUploadHttps.addCaption(
+                    videoId, _generateSrt(lang), lang);
+              }
             }
           }
         }
       }
-    }
+    // }
     _uploadPercentage = null;
     notifyListeners();
   }
