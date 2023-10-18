@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_translation/screens/translator_screen/local_utils/translator_provider.dart';
+import 'package:youtube_translation/services/user_https.dart';
 import 'package:youtube_translation/utils/key_storage.dart';
 
 class TagWidget extends StatefulWidget {
@@ -19,18 +20,7 @@ class _TagWidgetState extends State<TagWidget> {
   @override
   void initState() {
     // TODO: implement initState
-    
     tec = TextEditingController();
-    var tp = context.read<TranslatorProvider>();
-    KeyStorage.getKey(KeyStorage.tag).then((value){
-      if(value != null) {
-        var tags = value.split(',');
-        tags.removeWhere((tag) => tag.isEmpty);
-        tp.setTags = tags;
-      }
-    });
-
-
     super.initState();
   }
 
@@ -60,7 +50,8 @@ class _TagWidgetState extends State<TagWidget> {
             FocusScope.of(context).requestFocus(tagFocus);
           },
           child: Container(
-            padding: const EdgeInsets.only(left: 2, right: 2, top: 5, bottom: 5),
+            padding:
+                const EdgeInsets.only(left: 2, right: 2, top: 5, bottom: 5),
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(width: 1, color: Colors.white)),
@@ -70,12 +61,15 @@ class _TagWidgetState extends State<TagWidget> {
                 focusNode: FocusNode(),
                 onKey: (keyEvent) {
                   if (keyEvent.logicalKey == LogicalKeyboardKey.backspace) {
-                    if (!_textChanged && tp.tags.isNotEmpty && tec.text.isEmpty) {
+                    if (!_textChanged &&
+                        tp.tags.isNotEmpty &&
+                        tec.text.isEmpty) {
                       setState(() {
                         tec.text = tp.tags.removeLast();
                       });
                       FocusScope.of(context).requestFocus(tagFocus);
-                      tec.selection = TextSelection.fromPosition(TextPosition(offset: tec.text.length));
+                      tec.selection = TextSelection.fromPosition(
+                          TextPosition(offset: tec.text.length));
                     }
                   } else if (keyEvent.logicalKey == LogicalKeyboardKey.comma) {
                     createOne();
@@ -86,13 +80,13 @@ class _TagWidgetState extends State<TagWidget> {
                   child: Wrap(
                       children: tp.tags.map((e) => tagWidget(e)).toList() +
                           [writingArea]),
-                )
-            ),
+                )),
           ),
         ),
       ],
     );
   }
+
 //
   Widget tagWidget(String tag) {
     var tp = context.watch<TranslatorProvider>();
@@ -140,7 +134,7 @@ class _TagWidgetState extends State<TagWidget> {
             onSubmitted: (str) {
               createOne();
             },
-            onChanged: (str){
+            onChanged: (str) {
               _textChanged = true;
             },
             decoration: InputDecoration(
@@ -160,8 +154,11 @@ class _TagWidgetState extends State<TagWidget> {
     if (str == ',') {
       tec.text = '';
     } else if (str.isNotEmpty) {
-      if (!tp.tags.contains(str)) {
-        tp.addTag(str);
+      var tags = str.split(',');
+      for(var tag in tags){
+        if (!tp.tags.contains(tag.trim())) {
+          tp.addTag(tag.trim());
+        }
       }
       tec.text = '';
     }

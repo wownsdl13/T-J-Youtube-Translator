@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:youtube_translation/screens/translator_screen/local_utils/translator_provider.dart';
 import 'package:youtube_translation/utils/key_storage.dart';
 
 class KeyInput extends StatefulWidget {
@@ -16,17 +18,15 @@ class _KeyInputState extends State<KeyInput> {
   @override
   void initState() {
     // TODO: implement initState
+    var tp = context.read<TranslatorProvider>();
     KeyStorage.getKey(KeyStorage.chatGptKey).then((value){
       gptController.text = value ??= '';
-    });
-    KeyStorage.getKey(KeyStorage.youtubeApiKey).then((value){
-      youtubeController.text = value ??= '';
     });
     gptController.addListener(() async{
       await KeyStorage.setKey(KeyStorage.chatGptKey, gptController.text);
     });
     youtubeController.addListener(() async{
-      await KeyStorage.setKey(KeyStorage.youtubeApiKey, youtubeController.text);
+      tp.setYoutubeApiKey(youtubeController.text);
     });
     super.initState();
   }

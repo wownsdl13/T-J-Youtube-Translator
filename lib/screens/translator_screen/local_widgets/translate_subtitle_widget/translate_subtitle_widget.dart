@@ -65,7 +65,7 @@ class TranslateSubtitleWidget extends StatelessWidget {
         itemCount: tp.srtList.length,
         itemBuilder: (context, index) =>
             OneTranslateItem(
-                key: ValueKey('$index-${tp.languageCode}'),
+                key: ValueKey('${tp.srtList[index].order}-${tp.languageCode}'),
                 oneTranslateModel: tp.srtList[index], translatedText: tp.srtList[index].getLang(tp.languageCode)),
       );
     }else{

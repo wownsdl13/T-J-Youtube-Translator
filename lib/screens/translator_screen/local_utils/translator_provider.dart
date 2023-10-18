@@ -6,6 +6,7 @@ import 'package:youtube_translation/models/one_translate_model.dart';
 import 'package:youtube_translation/models/upload_percentage_model.dart';
 import 'package:youtube_translation/models/video_upload_model.dart';
 import 'package:youtube_translation/services/translate_https.dart';
+import 'package:youtube_translation/services/user_https.dart';
 import 'package:youtube_translation/services/youtube_upload_https.dart';
 import 'package:youtube_translation/utils/key_storage.dart';
 import 'dart:convert';
@@ -17,6 +18,13 @@ class TranslatorProvider extends ChangeNotifier {
   final srtList = <OneTranslateModel>[];
   final tags = <String>[];
 
+  void tagInit(){
+    UserHttps(_googleId!).getTags.then((value) {
+      setTags = value;
+      notifyListeners();
+    });
+  }
+
   set setTags(List<String> tags) {
     this.tags.clear();
     this.tags.addAll(tags);
@@ -25,14 +33,18 @@ class TranslatorProvider extends ChangeNotifier {
 
   void removeTag(String tag) {
     tags.remove(tag);
-    KeyStorage.setKey(KeyStorage.tag, tags.join(','));
+    UserHttps(_googleId!).updateTags(tags);
     notifyListeners();
   }
 
   void addTag(String tag) {
     tags.add(tag);
-    KeyStorage.setKey(KeyStorage.tag, tags.join(','));
+    UserHttps(_googleId!).updateTags(tags);
     notifyListeners();
+  }
+
+  void setYoutubeApiKey(String key){
+    UserHttps(_googleId!).updateYoutubeApiKey(key);
   }
 
   String _languageCode = OneTranslateModel.en;
@@ -98,15 +110,15 @@ class TranslatorProvider extends ChangeNotifier {
       notifyListeners();
       var txt = utf8.decode(data);
       var list = SrtSplitUtil(txt).split;
-      for (var l in list) {
-        var lang = await TranslateHttps.translateTxt(l.text);
+      await TranslateHttps.translateTxtList(list, (srtModel, translatedText){
         srtList.add(OneTranslateModel(
-          order: l.order,
-          period: l.time,
-          translations: lang,
+          order: srtModel.order,
+          period: srtModel.time,
+          translations: translatedText,
         ));
+        srtList.sort((a, b) => a.order.compareTo(b.order));
         notifyListeners();
-      }
+      });
       _readingSrt = false;
       notifyListeners();
     }
@@ -188,7 +200,6 @@ class TranslatorProvider extends ChangeNotifier {
     return srtList.isNotEmpty &&
         _translatedTitle != null &&
         _translatedDescription != null &&
-        await KeyStorage.hasKey(KeyStorage.youtubeApiKey) &&
         _videoUploadModel != null &&
         _thumbnail != null &&
         tags.isNotEmpty;
@@ -209,21 +220,28 @@ class TranslatorProvider extends ChangeNotifier {
     return text;
   }
 
-  void changeSubTxt(OneTranslateModel model, String txt){
+  void changeSubTxt(OneTranslateModel model, String txt) {
     model.setLang(languageCode, txt);
     notifyListeners();
   }
 
-  final _googleSignIn = GoogleSignIn(scopes: [
-    'https://www.googleapis.com/auth/youtube.upload',
-    'https://www.googleapis.com/auth/youtube.force-ssl',
-  ], clientId: '133538713387-d4jnbid8v4v1tl6p7f4v29afpdns94tl.apps.googleusercontent.com');
+  final _googleSignIn = GoogleSignIn(
+      scopes: [
+        'https://www.googleapis.com/auth/youtube.upload',
+        'https://www.googleapis.com/auth/youtube.force-ssl',
+      ],
+      clientId:
+          '133538713387-d4jnbid8v4v1tl6p7f4v29afpdns94tl.apps.googleusercontent.com');
   GoogleSignInAccount? _googleId;
 
   bool get isLogin => _googleId != null;
 
   Future login() async {
     _googleId = await _googleSignIn.signIn();
+    if(_googleId!=null){
+      await UserHttps(_googleId!).getRefreshToken((await _googleId!.authentication).accessToken!);
+      tagInit();
+    }
     notifyListeners();
   }
 
@@ -235,15 +253,17 @@ class TranslatorProvider extends ChangeNotifier {
     }
   }
 
-
   UploadPercentageModel? _uploadPercentage;
+
   int get uploadPercentage => _uploadPercentage!.percentage;
+
   String get uploadText => _uploadPercentage!.text;
+
   bool get isUploading => _uploadPercentage != null;
 
-  Future uploadTest() async{
+  Future uploadTest() async {
     _uploadPercentage = UploadPercentageModel('uploading video');
-    for(var p = 0; p <= 100; p++){
+    for (var p = 0; p <= 100; p++) {
       _uploadPercentage!.setPercentage = p;
       await Future.delayed(const Duration(milliseconds: 200));
       notifyListeners();
@@ -261,70 +281,69 @@ class TranslatorProvider extends ChangeNotifier {
 
   Future upload() async {
     // if (isLogin && hasVideo) {
-      var oAuthToken = (await _googleId!.authentication).accessToken;
-      if (oAuthToken != null) {
-        _uploadPercentage = UploadPercentageModel('uploading video');
-        notifyListeners();
-        var videoId = '49D4RtnkTl0';
-        // var videoId = await YoutubeUploadHttps(oAuthToken).uploadVideo(
-        //     _videoUploadModel!.videoStream, _videoUploadModel!.size, tags,
-        //     uploadProgressCallback: (double percentage) {
-        //       var p = (percentage * 100).floor();
-        //       _uploadPercentage!.setPercentage = p;
-        //       notifyListeners();
-        //     });
-        if (videoId != null) {
-          oAuthToken = (await _googleId!.authentication).accessToken;
-          if (oAuthToken != null) {
-            _uploadPercentage!.setText = 'uploading thumbnail';
+    var oAuthToken = (await _googleId!.authentication).accessToken;
+    if (oAuthToken != null) {
+      _uploadPercentage = UploadPercentageModel('uploading video');
+      notifyListeners();
+      var videoId = '0XI28b0bggM';
+      // var videoId = await YoutubeUploadHttps(oAuthToken).uploadVideo(
+      //     _videoUploadModel!.videoStream, _videoUploadModel!.size, tags, await _localizations,
+      //     uploadProgressCallback: (double percentage) {
+      //       var p = (percentage * 100).floor();
+      //       _uploadPercentage!.setPercentage = p;
+      //       notifyListeners();
+      //     });
+      if (videoId != null) {
+        oAuthToken = (await _googleId!.authentication).accessToken;
+        if (oAuthToken != null) {
+          _uploadPercentage!.setText = 'uploading thumbnail';
+          notifyListeners();
+          var youtubeUploadHttps = YoutubeUploadHttps(oAuthToken, _googleId!);
+          await youtubeUploadHttps.setThumbnail(videoId, oAuthToken, thumbnail);
+          if (srtList.isNotEmpty) {
+            _uploadPercentage!.setText = 'uploading captions';
             notifyListeners();
-            var youtubeUploadHttps = YoutubeUploadHttps(oAuthToken);
-            // await youtubeUploadHttps.setThumbnail(videoId, thumbnail);
-            var localizations = <String, Map<String, String>>{};
-
-            String titleHeader = '';
-            if (await KeyStorage.hasKey(KeyStorage.titleHeader) &&
-                (await KeyStorage.getKey(KeyStorage.titleHeader))!.trim()
-                    .isNotEmpty) {
-              titleHeader =
-              '${await KeyStorage.getKey(KeyStorage.titleHeader)} ';
-            }
-            String descriptionHeader = '';
-            if (await KeyStorage.hasKey(KeyStorage.descriptionHeader) &&
-                (await KeyStorage.getKey(KeyStorage.descriptionHeader))!.trim()
-                    .isNotEmpty) {
-              descriptionHeader =
-              '${await KeyStorage.getKey(KeyStorage.descriptionHeader)}\n\n';
-            }
-
-            print('..11');
-            // if (_translatedTitle != null && _translatedDescription != null) {
-            //   for (var lang in OneTranslateModel.langList) {
-            //     print('..22 > $lang');
-            //     localizations[lang] = {
-            //       'title': '$titleHeader${_translatedTitle![lang]!}',
-            //       'description': descriptionHeader +
-            //           _translatedDescription![lang]!,
-            //     };
-            //   }
-            // }
-            _uploadPercentage!.setText = 'uploading title and description';
-            notifyListeners();
-            await youtubeUploadHttps.setVideoLocalizations(
-                videoId, localizations);
-            if (srtList.isNotEmpty) {
-              _uploadPercentage!.setText = 'uploading captions';
-              notifyListeners();
-              for (var lang in OneTranslateModel.langList) {
-                await youtubeUploadHttps.addCaption(
-                    videoId, _generateSrt(lang), lang);
-              }
+            for (var lang in OneTranslateModel.langList) {
+              var srt = _generateSrt(lang);
+              await YoutubeUploadHttps(oAuthToken, _googleId!).uploadCaption(oAuthToken, videoId, lang, srt);
             }
           }
         }
       }
+    }
     // }
     _uploadPercentage = null;
     notifyListeners();
+  }
+
+  Future<Map<String, Map<String, String>>> get _localizations async{
+    var localizations = <String, Map<String, String>>{};
+    String titleHeader = '';
+    if (await KeyStorage.hasKey(KeyStorage.titleHeader) &&
+        (await KeyStorage.getKey(KeyStorage.titleHeader))!
+            .trim()
+            .isNotEmpty) {
+      titleHeader = '${await KeyStorage.getKey(KeyStorage.titleHeader)} ';
+    }
+    String descriptionHeader = '';
+    if (await KeyStorage.hasKey(KeyStorage.descriptionHeader) &&
+        (await KeyStorage.getKey(KeyStorage.descriptionHeader))!
+            .trim()
+            .isNotEmpty) {
+      descriptionHeader =
+      '${await KeyStorage.getKey(KeyStorage.descriptionHeader)}\n\n';
+    }
+    if (_translatedTitle != null && _translatedDescription != null) {
+      for (var lang in OneTranslateModel.langList) {
+        localizations[lang] = {
+          'title': '$titleHeader${_translatedTitle![lang]!}',
+          'description': descriptionHeader +
+              _translatedDescription![lang]!,
+        };
+      }
+      return localizations;
+    }else{
+      throw Exception('title, description are not ready!');
+    }
   }
 }

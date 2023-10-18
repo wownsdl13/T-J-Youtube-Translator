@@ -2,10 +2,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class KeyStorage {
   static const chatGptKey = 'chatGptKey';
-  static const youtubeApiKey = 'youtubeApiKey';
   static const titleHeader = 'titleHeader';
   static const descriptionHeader = 'descriptionHeader';
   static const tag = 'tag';
+
+  //for key https
+  static const String _sessionKey = 'session';
+  static const String _refreshSessionKey = 'refresh_token';
 
 
   static Future<bool> hasKey(String name) async {
@@ -22,4 +25,34 @@ class KeyStorage {
     var s = await SharedPreferences.getInstance();
     await s.setString(name, key);
   }
+
+
+
+
+
+
+  static Future setToken(
+      {String? accessToken, String? refreshToken}) async {
+    var prefs = await SharedPreferences.getInstance();
+    if (accessToken != null) {
+      await prefs.setString(_sessionKey, accessToken);
+    }
+    if (refreshToken != null) {
+      await prefs.setString(_refreshSessionKey, refreshToken);
+    }
+  }
+
+  static Future<String?> get accessToken async {
+    var prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_sessionKey);
+  }
+
+  static Future<String?> get refreshToken async {
+    var prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_refreshSessionKey);
+  }
+
+  //
+  static Future<bool> get hasRefreshToken async => (await refreshToken) != null;
+  static Future<bool> get hasAccessToken async  => (await accessToken) != null;
 }
