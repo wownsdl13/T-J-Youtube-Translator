@@ -18,6 +18,12 @@ class TranslatorProvider extends ChangeNotifier {
   final srtList = <OneTranslateModel>[];
   final tags = <String>[];
 
+  String _comment = '';
+  set setComment(String comment){
+    _comment = comment;
+    notifyListeners();
+  }
+
   void tagInit(){
     UserHttps(_googleId!).getTags.then((value) {
       setTags = value;
@@ -54,6 +60,22 @@ class TranslatorProvider extends ChangeNotifier {
   set setLanguageCode(String languageCode) {
     _languageCode = languageCode;
     notifyListeners();
+  }
+
+  Future<String> get getTitleHeader async{
+    return await UserHttps(_googleId!).getTitleHeader;
+  }
+
+  Future setTitleHeader(String txt) async{
+    return await UserHttps(_googleId!).updateTitleHeader(txt);
+  }
+
+  Future<String> get getDescriptionHeader async{
+    return await UserHttps(_googleId!).getDescriptionHeader;
+  }
+
+  Future setDescriptionHeader(String txt) async{
+    return await UserHttps(_googleId!).updateDescriptionHeader(txt);
   }
 
   var _title = '';
@@ -261,77 +283,54 @@ class TranslatorProvider extends ChangeNotifier {
 
   bool get isUploading => _uploadPercentage != null;
 
-  Future uploadTest() async {
-    _uploadPercentage = UploadPercentageModel('uploading video');
-    for (var p = 0; p <= 100; p++) {
-      _uploadPercentage!.setPercentage = p;
-      await Future.delayed(const Duration(milliseconds: 200));
-      notifyListeners();
-    }
-    await Future.delayed(const Duration(milliseconds: 1000));
-    _uploadPercentage!.setText = 'uploading thumbnail';
-    notifyListeners();
-    await Future.delayed(const Duration(milliseconds: 1000));
-    _uploadPercentage!.setText = 'uploading captions';
-    notifyListeners();
-    await Future.delayed(const Duration(milliseconds: 1000));
-    _uploadPercentage = null;
-    notifyListeners();
-  }
-
   Future upload() async {
-    // if (isLogin && hasVideo) {
+    if (isLogin && hasVideo) {
     var oAuthToken = (await _googleId!.authentication).accessToken;
     if (oAuthToken != null) {
       _uploadPercentage = UploadPercentageModel('uploading video');
       notifyListeners();
-      var videoId = '0XI28b0bggM';
-      // var videoId = await YoutubeUploadHttps(oAuthToken).uploadVideo(
-      //     _videoUploadModel!.videoStream, _videoUploadModel!.size, tags, await _localizations,
-      //     uploadProgressCallback: (double percentage) {
-      //       var p = (percentage * 100).floor();
-      //       _uploadPercentage!.setPercentage = p;
-      //       notifyListeners();
-      //     });
+      var videoId = await YoutubeUploadHttps(oAuthToken, _googleId!).uploadVideo(
+          _videoUploadModel!.videoStream, _videoUploadModel!.size, tags, await _localizations,
+          uploadProgressCallback: (double percentage) {
+            var p = (percentage * 100).floor();
+            _uploadPercentage!.setPercentage = p;
+            notifyListeners();
+          });
       if (videoId != null) {
         oAuthToken = (await _googleId!.authentication).accessToken;
         if (oAuthToken != null) {
           _uploadPercentage!.setText = 'uploading thumbnail';
           notifyListeners();
           var youtubeUploadHttps = YoutubeUploadHttps(oAuthToken, _googleId!);
-          await youtubeUploadHttps.setThumbnail(videoId, oAuthToken, thumbnail);
+          await youtubeUploadHttps.setThumbnail(videoId, thumbnail);
           if (srtList.isNotEmpty) {
             _uploadPercentage!.setText = 'uploading captions';
             notifyListeners();
             for (var lang in OneTranslateModel.langList) {
               var srt = _generateSrt(lang);
-              await YoutubeUploadHttps(oAuthToken, _googleId!).uploadCaption(oAuthToken, videoId, lang, srt);
+              await YoutubeUploadHttps(oAuthToken, _googleId!).uploadCaption(videoId, lang, srt);
             }
+          }
+          if(_comment.trim().isNotEmpty){
+            await YoutubeUploadHttps(oAuthToken, _googleId!).postComment(videoId, _comment.trim());
           }
         }
       }
     }
-    // }
+    }
     _uploadPercentage = null;
     notifyListeners();
   }
 
   Future<Map<String, Map<String, String>>> get _localizations async{
     var localizations = <String, Map<String, String>>{};
-    String titleHeader = '';
-    if (await KeyStorage.hasKey(KeyStorage.titleHeader) &&
-        (await KeyStorage.getKey(KeyStorage.titleHeader))!
-            .trim()
-            .isNotEmpty) {
-      titleHeader = '${await KeyStorage.getKey(KeyStorage.titleHeader)} ';
+    String titleHeader = (await getTitleHeader).trim();
+    if(titleHeader.isNotEmpty){
+      titleHeader += ' ';
     }
-    String descriptionHeader = '';
-    if (await KeyStorage.hasKey(KeyStorage.descriptionHeader) &&
-        (await KeyStorage.getKey(KeyStorage.descriptionHeader))!
-            .trim()
-            .isNotEmpty) {
-      descriptionHeader =
-      '${await KeyStorage.getKey(KeyStorage.descriptionHeader)}\n\n';
+    String descriptionHeader = (await getDescriptionHeader).trim();
+    if(descriptionHeader.isNotEmpty){
+      descriptionHeader += '\n\n\n';
     }
     if (_translatedTitle != null && _translatedDescription != null) {
       for (var lang in OneTranslateModel.langList) {

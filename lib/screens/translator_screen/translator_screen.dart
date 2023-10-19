@@ -47,6 +47,9 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
         value: context.read<TranslatorProvider>(),
         builder: (context, widget) {
           var tp = context.watch<TranslatorProvider>();
+          if (!tp.isLogin) {
+            return const LoginScreen();
+          }
           return Stack(
             fit: StackFit.expand,
             children: [
@@ -197,7 +200,6 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
                 ),
               ),
               const UploadingWidget(),
-              if (!tp.isLogin) const LoginScreen()
             ],
           );
         },

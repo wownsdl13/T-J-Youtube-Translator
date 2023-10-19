@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:youtube_translation/screens/translator_screen/local_utils/translator_provider.dart';
 import 'package:youtube_translation/utils/key_storage.dart';
 
 class TitleHeaderWidget extends StatefulWidget {
@@ -14,11 +16,14 @@ class _TitleHeaderWidgetState extends State<TitleHeaderWidget> {
   @override
   void initState() {
     // TODO: implement initState
-    KeyStorage.getKey(KeyStorage.titleHeader).then((value){
-      textEditingController.text = value ?? '';
+    var tp = context.read<TranslatorProvider>();
+    tp.getTitleHeader.then((value){
+      setState(() {
+        textEditingController.text = value ?? '';
+      });
     });
     textEditingController.addListener(() async{
-      await KeyStorage.setKey(KeyStorage.titleHeader, textEditingController.text.trim());
+      await tp.setTitleHeader(textEditingController.text);
     });
     super.initState();
   }

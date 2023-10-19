@@ -22,14 +22,7 @@ class ChangeLang extends StatelessWidget {
       child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            OneTranslateModel.ko,
-            OneTranslateModel.en,
-            OneTranslateModel.ja,
-            OneTranslateModel.fr,
-            OneTranslateModel.zh,
-            OneTranslateModel.es,
-          ]
+          children: OneTranslateModel.langList
               .map((e) => GestureDetector(
             behavior: HitTestBehavior.translucent,
                 onTap: (){

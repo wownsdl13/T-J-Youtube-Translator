@@ -31,6 +31,33 @@ class UserHttps extends RootHttps {
     var result = await post('update_youtube_api_key', {'key':key});
   }
 
+
+
+  Future updateTitleHeader(String txt) async{
+    var result = await post('update_title_header', {'txt':txt});
+  }
+
+  Future<String> get getTitleHeader async{
+    var result = await get('get_title_header');
+    if(result.isOk){
+      return jsonDecode(result.body)['titleHeader'];
+    }
+    return '';
+  }
+
+
+  Future updateDescriptionHeader(String txt) async{
+    var result = await post('update_description_header', {'txt':txt});
+  }
+
+  Future<String> get getDescriptionHeader async{
+    var result = await get('get_description_header');
+    if(result.isOk){
+      return jsonDecode(result.body)['descriptionHeader'];
+    }
+    return '';
+  }
+
   @override
   // TODO: implement path
   String get path => 'user';

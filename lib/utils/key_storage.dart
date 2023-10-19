@@ -2,8 +2,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class KeyStorage {
   static const chatGptKey = 'chatGptKey';
-  static const titleHeader = 'titleHeader';
-  static const descriptionHeader = 'descriptionHeader';
   static const tag = 'tag';
 
   //for key https

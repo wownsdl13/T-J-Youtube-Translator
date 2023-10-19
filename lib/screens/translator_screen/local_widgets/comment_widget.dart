@@ -3,27 +3,27 @@ import 'package:provider/provider.dart';
 import 'package:youtube_translation/screens/translator_screen/local_utils/translator_provider.dart';
 import 'package:youtube_translation/utils/key_storage.dart';
 
-class DescriptionHeaderWidget extends StatefulWidget {
-  const DescriptionHeaderWidget({Key? key}) : super(key: key);
+class CommentWidget extends StatefulWidget {
+  const CommentWidget({Key? key}) : super(key: key);
 
   @override
-  State<DescriptionHeaderWidget> createState() => _DescriptionHeaderWidgetState();
+  State<CommentWidget> createState() => _CommentWidgetState();
 }
 
-class _DescriptionHeaderWidgetState extends State<DescriptionHeaderWidget> {
+class _CommentWidgetState extends State<CommentWidget> {
   final textEditingController = TextEditingController();
 
   @override
   void initState() {
     // TODO: implement initState
     var tp = context.read<TranslatorProvider>();
-    tp.getDescriptionHeader.then((value){
+    tp.getTitleHeader.then((value){
       setState(() {
         textEditingController.text = value ?? '';
       });
     });
     textEditingController.addListener(() async{
-      await tp.setDescriptionHeader(textEditingController.text);
+      await tp.setTitleHeader(textEditingController.text);
     });
     super.initState();
   }
@@ -39,7 +39,7 @@ class _DescriptionHeaderWidgetState extends State<DescriptionHeaderWidget> {
           constraints: const BoxConstraints(minWidth: 100),
           padding: const EdgeInsets.only(top: 13),
           child: const Text(
-            'D Header : ',
+            'Comment : ',
             textAlign: TextAlign.end,
             style: TextStyle(color: Colors.white, fontSize: 18),
           ),
@@ -49,22 +49,20 @@ class _DescriptionHeaderWidgetState extends State<DescriptionHeaderWidget> {
         ),
         Container(
             padding: const EdgeInsets.only(left: 10, right: 10),
-            constraints: const BoxConstraints(
-              minHeight: 50
-            ),
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(width: 1, color: Colors.white)),
             width: 250,
+            height: 50,
             child: TextField(
               controller: textEditingController,
-              maxLines: null,
+              maxLines: 1,
               cursorColor: Colors.grey.shade400,
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                   border: InputBorder.none,
                   hintStyle: TextStyle(color: Colors.grey.shade700),
-                  hintText: 'Input description header'),
+                  hintText: 'Input title header'),
             )),
       ],
     );

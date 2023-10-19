@@ -26,7 +26,9 @@ class _KeyInputState extends State<KeyInput> {
       await KeyStorage.setKey(KeyStorage.chatGptKey, gptController.text);
     });
     youtubeController.addListener(() async{
-      tp.setYoutubeApiKey(youtubeController.text);
+      if(youtubeController.text.isNotEmpty) {
+        tp.setYoutubeApiKey(youtubeController.text);
+      }
     });
     super.initState();
   }
