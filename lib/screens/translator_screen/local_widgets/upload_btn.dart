@@ -73,7 +73,7 @@ class UploadBtn extends StatelessWidget {
             ),
             const SizedBox(height: 30),
             IgnorePointer(
-              ignoring: tp.readyToUpload,
+              ignoring: !tp.readyToUpload,
               child: Opacity(
                 opacity: tp.readyToUpload?1:.3,
                 child: GestureDetector(
