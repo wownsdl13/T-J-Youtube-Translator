@@ -45,9 +45,8 @@ class YoutubeUploadHttps extends RootHttps {
         },
         'status': {
           'selfDeclaredMadeForKids': false,
-          'privacyStatus': 'private',
+          'privacyStatus': 'unlisted',
         },
-        'localizations': localizations
       }),
     );
     final uploadUrl = initResponse.headers['location']!;
@@ -118,8 +117,19 @@ class YoutubeUploadHttps extends RootHttps {
     };
    */
 
-  Future<void> setThumbnail(
-      String videoId, Uint8List thumbnail, {bool retry = true}) async {
+  Future setVideoLocalizations(
+    String videoId,
+    Map<String, Map<String, String>> localizations,
+  ) async {
+    await post('set_video_localizations', {
+      'oAuthToken': oAuthToken,
+      'videoId': videoId,
+      'localizations': localizations,
+    });
+  }
+
+  Future<void> setThumbnail(String videoId, Uint8List thumbnail,
+      {bool retry = true}) async {
     // 'multipart/form-data' 요청 생성
     var request = http.MultipartRequest('POST', uri('upload_thumbnail'))
       ..fields['videoId'] = videoId // 필요한 필드가 있으면 추가
@@ -141,7 +151,9 @@ class YoutubeUploadHttps extends RootHttps {
       if (response.statusCode >= 200 && response.statusCode <= 299) {
         print('Thumbnail uploaded successfully');
       } else {
-        if (retry && response.statusCode == 401 && await KeyStorage.hasRefreshToken) {
+        if (retry &&
+            response.statusCode == 401 &&
+            await KeyStorage.hasRefreshToken) {
           var getAccessToken = await UserHttps(googleSignInAccount).post(
               'get_access_token',
               {
@@ -162,7 +174,8 @@ class YoutubeUploadHttps extends RootHttps {
     }
   }
 
-  Future<String?> uploadCaption(String videoId, String language, String srt) async {
+  Future<String?> uploadCaption(
+      String videoId, String language, String srt) async {
     var result = await put('upload_caption', {
       'oAuthToken': oAuthToken,
       'videoId': videoId,
@@ -175,12 +188,9 @@ class YoutubeUploadHttps extends RootHttps {
     return null;
   }
 
-  Future postComment(String videoId, String text) async{
-    await put('post_comment', {
-      'oAuthToken':oAuthToken,
-      'videoId':videoId,
-      'text':text
-    });
+  Future postComment(String videoId, String text) async {
+    await put('post_comment',
+        {'oAuthToken': oAuthToken, 'videoId': videoId, 'text': text});
   }
 
   @override

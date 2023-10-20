@@ -47,7 +47,7 @@ class TranslateHttps {
                   "temperature": 0,
                   'max_tokens': 3000
                 }))
-            .timeout(const Duration(seconds: 60));
+            .timeout(const Duration(seconds: 120));
         if (result.statusCode == 200) {
           var gpt =
               GptResponse.fromJson(jsonDecode(utf8.decode(result.bodyBytes)));

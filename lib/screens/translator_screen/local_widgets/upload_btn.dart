@@ -11,10 +11,10 @@ class UploadBtn extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () {
-        // tp.download();
+        tp.download();
       },
       child: Container(
-        margin: const EdgeInsets.only(top: 20),
+        margin: const EdgeInsets.only(top: 20, left: 100, bottom: 5),
         width: 250,
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -72,32 +72,25 @@ class UploadBtn extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 30),
-            FutureBuilder(
-              future: tp.readyToUpload,
-              builder: (context, snapshot) {
-                var ready = snapshot.hasData && (snapshot.data ?? false);
-                return IgnorePointer(
-                  ignoring: false,
-                  // ignoring: !ready,
-                  child: Opacity(
-                    opacity: ready?1:.3,
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.translucent,
-                      onTap: (){
-                        tp.upload();
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.fromLTRB(30, 13, 30, 13),
-                        decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.white), borderRadius: BorderRadius.circular(8)),
-                        child: const Text(
-                          'Upload to Youtube',
-                          style: TextStyle(color: Colors.white, fontSize: 18),
-                        ),
-                      ),
+            IgnorePointer(
+              ignoring: tp.readyToUpload,
+              child: Opacity(
+                opacity: tp.readyToUpload?1:.3,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: (){
+                    tp.upload();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(30, 13, 30, 13),
+                    decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.white), borderRadius: BorderRadius.circular(8)),
+                    child: const Text(
+                      'Upload to Youtube',
+                      style: TextStyle(color: Colors.white, fontSize: 18),
                     ),
                   ),
-                );
-              }
+                ),
+              ),
             ),
           ],
         ),

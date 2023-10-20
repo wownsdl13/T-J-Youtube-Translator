@@ -4,6 +4,7 @@ import 'package:youtube_translation/screens/translator_screen/local_utils/transl
 import 'package:youtube_translation/screens/translator_screen/translator_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 

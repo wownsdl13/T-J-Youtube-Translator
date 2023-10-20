@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_translation/screens/translator_screen/local_utils/translator_provider.dart';
-import 'package:youtube_translation/utils/key_storage.dart';
 
-class CommentWidget extends StatefulWidget {
-  const CommentWidget({Key? key}) : super(key: key);
+class VideoIdWidget extends StatefulWidget {
+  const VideoIdWidget({Key? key}) : super(key: key);
 
   @override
-  State<CommentWidget> createState() => _CommentWidgetState();
+  State<VideoIdWidget> createState() => _VideoIdWidgetState();
 }
 
-class _CommentWidgetState extends State<CommentWidget> {
+class _VideoIdWidgetState extends State<VideoIdWidget> {
   final textEditingController = TextEditingController();
 
   @override
   void initState() {
     // TODO: implement initState
     var tp = context.read<TranslatorProvider>();
-    textEditingController.addListener((){
-      tp.setComment = textEditingController.text;
+    textEditingController.text = tp.videoId;
+    textEditingController.addListener(() {
+      tp.setVideoId = textEditingController.text.trim();
     });
     super.initState();
   }
@@ -34,7 +35,7 @@ class _CommentWidgetState extends State<CommentWidget> {
           constraints: const BoxConstraints(minWidth: 100),
           padding: const EdgeInsets.only(top: 13),
           child: const Text(
-            'Comment : ',
+            'Video id : ',
             textAlign: TextAlign.end,
             style: TextStyle(color: Colors.white, fontSize: 18),
           ),
@@ -43,21 +44,23 @@ class _CommentWidgetState extends State<CommentWidget> {
           width: 10,
         ),
         Container(
-            padding: const EdgeInsets.only(left: 10, right: 10),
+          width: 250,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(width: 1, color: Colors.white)),
-            width: 250,
-            height: 50,
-            child: TextField(
-              controller: textEditingController,
-              maxLines: null,
-              cursorColor: Colors.grey.shade400,
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintStyle: TextStyle(color: Colors.grey.shade700),
-                  hintText: 'Input Comment'),
+            constraints: const BoxConstraints(maxWidth: 700),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 10, right: 10),
+              child: TextField(
+                controller: textEditingController,
+                maxLines: null,
+                cursorColor: Colors.grey.shade400,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintStyle: TextStyle(color: Colors.grey.shade700),
+                    hintText: 'Input youtube video id'),
+              ),
             )),
       ],
     );
