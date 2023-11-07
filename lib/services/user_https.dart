@@ -31,7 +31,9 @@ class UserHttps extends RootHttps {
     var result = await post('update_youtube_api_key', {'key':key});
   }
 
-
+  Future updateDeepLApiKey(String key) async{
+    var result = await post('update_deepl_api_key', {'key':key});
+  }
 
   Future updateTitleHeader(String txt) async{
     var result = await post('update_title_header', {'txt':txt});

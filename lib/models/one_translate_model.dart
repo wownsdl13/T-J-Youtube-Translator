@@ -6,16 +6,16 @@ class OneTranslateModel {
   static const String fr = 'fr'; //프랑스어
   static const String zh = 'zh'; //중국어
   static const String es = 'es'; //스페인어
-  static const String vi = 'vi'; //베트남어
-  static const String ar = 'ar'; //아랍어
+  // static const String vi = 'vi'; //베트남어
+  // static const String ar = 'ar'; //아랍어
   static const String nl = 'nl'; //네덜란드어
   static const String de = 'de'; //독일어
-  static const String ms = 'ms'; //말레이어
+  // static const String ms = 'ms'; //말레이어
   static const String ru = 'ru'; //러시아어
   static const String uk = 'uk'; //우크라이나어
 
   static List<String> get langList =>
-      [ko, en, ja, fr, zh, es, vi, ar, nl, de, ms, ru, uk];
+      [ko, en, ja, fr, zh, es, nl, de,  ru, uk];
 
   static String langName(String languageCode) {
     switch (languageCode) {
@@ -33,16 +33,16 @@ class OneTranslateModel {
         return 'Chinese';
       case OneTranslateModel.es:
         return 'Spanish';
-      case OneTranslateModel.vi:
-        return 'Vietnam';
-      case OneTranslateModel.ar:
-        return 'Arab';
+      // case OneTranslateModel.vi:
+      //   return 'Vietnam';
+      // case OneTranslateModel.ar:
+      //   return 'Arab';
       case OneTranslateModel.nl:
         return 'Dutch';
       case OneTranslateModel.de:
         return 'German';
-      case OneTranslateModel.ms:
-        return 'Malaysia';
+      // case OneTranslateModel.ms:
+      //   return 'Malaysia';
       case OneTranslateModel.ru:
         return 'Russia';
       case OneTranslateModel.uk:
@@ -70,6 +70,9 @@ class OneTranslateModel {
     if (addQuotesAndBracket) {
       return _convert(_translations[languageCode]!);
     } else {
+      if(_translations[languageCode] == null) {
+        print('..?? > ${languageCode}, ${_translations}');
+      }
       return _translations[languageCode]!;
     }
   }

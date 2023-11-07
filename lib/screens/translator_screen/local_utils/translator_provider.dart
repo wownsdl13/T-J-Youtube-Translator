@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+import 'package:youtube_translation/models/multiple_srt_model.dart';
+import 'package:youtube_translation/models/one_srt_model.dart';
 import 'package:youtube_translation/models/one_translate_model.dart';
 import 'package:youtube_translation/models/upload_percentage_model.dart';
 import 'package:youtube_translation/models/video_upload_model.dart';
@@ -72,6 +74,11 @@ class TranslatorProvider extends ChangeNotifier {
 
   void setYoutubeApiKey(String key) {
     UserHttps(_googleId!).updateYoutubeApiKey(key);
+  }
+
+
+  void setDeepLApiKey(String key) {
+    UserHttps(_googleId!).updateDeepLApiKey(key);
   }
 
   String _languageCode = OneTranslateModel.en;
@@ -153,6 +160,26 @@ class TranslatorProvider extends ChangeNotifier {
       notifyListeners();
       var txt = utf8.decode(data);
       var list = SrtSplitUtil(txt).split;
+      // var oAuthToken = (await _googleId!.authentication).accessToken;
+      // if(oAuthToken != null) {
+      //   var srtMap = <int, MultipleSrtModel>{};
+      //   var originalList = SrtSplitUtil(txt).split;
+      //   for(var model in originalList){
+      //     srtMap[model.order] = MultipleSrtModel(model);
+      //   }
+      //   for(var m in srtMap.values){
+      //     for(var lang in OneTranslateModel.langList){
+      //       print('o : ${m.originalText}');
+      //       var translatedTxt = await YoutubeUploadHttps(oAuthToken, _googleId!).translateText(
+      //           m.originalText, lang);
+      //       print('t : $translatedTxt');
+      //       m.addOne(lang, translatedTxt);
+      //     }
+      //   }
+      //   srtList.addAll(srtMap.values.map((e) => e.translationModel).toList());
+      //   notifyListeners();
+      // }
+
       await TranslateHttps.translateTxtList(list, (srtModel, translatedText) {
         srtList.add(OneTranslateModel(
           order: srtModel.order,
@@ -306,6 +333,8 @@ class TranslatorProvider extends ChangeNotifier {
   String get uploadText => _uploadPercentage!.text;
 
   bool get isUploading => _uploadPercentage != null;
+
+
 
   Future upload() async {
     if (isLogin &&

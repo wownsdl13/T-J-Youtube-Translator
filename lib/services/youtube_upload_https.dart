@@ -182,15 +182,18 @@ class YoutubeUploadHttps extends RootHttps {
       'language': language,
       'srt': srt
     });
-    if (result.isOk) {
-      return jsonDecode(result.body)['location'];
-    }
     return null;
   }
 
   Future postComment(String videoId, String text) async {
     await put('post_comment',
         {'oAuthToken': oAuthToken, 'videoId': videoId, 'text': text});
+  }
+
+  Future<String> translateText(String text, String targetLanguage) async{
+    var result = await post('translate_text',
+        {'text': text, 'targetLanguage': targetLanguage});
+    return result.body;
   }
 
   @override

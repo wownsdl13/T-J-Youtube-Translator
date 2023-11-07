@@ -22,9 +22,7 @@ class TranslateHttps {
       })
         ..[OneTranslateModel.original] = srtTxt;
     }
-    var tryTime = 0;
-    while (tryTime < 5) {
-      tryTime++;
+    while (true) {
       try {
         var result = await http
             .post(Uri.parse(_chatGPTUrl),
@@ -34,42 +32,52 @@ class TranslateHttps {
                       'Bearer ${await KeyStorage.getKey(KeyStorage.chatGptKey)}'
                 },
                 body: jsonEncode({
-                  'model': 'gpt-4',
+                  'model': 'gpt-3.5-turbo-1106',
                   "messages": [
                     {
                       "role": "user",
                       "content": """
-          translate text following these rules. translate language is ${OneTranslateModel.langList.join(', ')} and form is {"ko":..., ...}. keep original if it's same language. Speak informally, and Respond just only json. there's no meaning of ... so just ignore it. Maintain the line breaks:
+          translate text following these rules : translate languages are ${OneTranslateModel.langList.join(', ')}. form is {"ko":..., ...}. keep original if it's same language. Speak informally, Maintain the line breaks. Respond only json:
           $srtTxt
           """
                     }
                   ],
                   "temperature": 0,
-                  'max_tokens': 3000
+                  'max_tokens': 4096
                 }))
-            .timeout(const Duration(seconds: 120));
+            .timeout(const Duration(seconds: 620));
+        await Future.delayed(const Duration(seconds: 2));
         if (result.statusCode == 200) {
           var gpt =
               GptResponse.fromJson(jsonDecode(utf8.decode(result.bodyBytes)));
-          print('total tokens > ${gpt.usage.totalTokens}');
-          return (jsonDecode(gpt.text) as Map)
+          var map = (jsonDecode(gpt.text) as Map)
               .map((key, value) => MapEntry(key.toString(), value.toString()))
             ..[OneTranslateModel.original] = srtTxt;
+          var hasAll = true;
+          for(var lang in OneTranslateModel.langList){
+            if(!map.containsKey(lang)){
+              hasAll = false;
+              break;
+            }
+          }
+          if(!hasAll){
+            print('continue!!');
+            continue;
+          }
+          return map;
         } else {
           print('not 200! > ${result.body}');
         }
       } catch (e) {
         print(e);
       }
-      await Future.delayed(const Duration(seconds: 5));
     }
-    return {};
   }
 
   static Future<void> translateTxtList(
       List<OneSrtModel> srtList, TranslateCallback callback) async {
     // 동시 실행할 수 있는 최대 작업 수입니다.
-    const maxConcurrentTasks = 30;
+    const maxConcurrentTasks = 1;
 
     // 동시에 처리할 수 있는 작업 수를 제어하는 카운터.
     var runningTasks = 0;

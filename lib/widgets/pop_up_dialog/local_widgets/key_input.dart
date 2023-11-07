@@ -13,6 +13,7 @@ class KeyInput extends StatefulWidget {
 
 class _KeyInputState extends State<KeyInput> {
   final gptController = TextEditingController();
+  final deepLAPIKeyController = TextEditingController();
   final youtubeController = TextEditingController();
 
   @override
@@ -24,6 +25,11 @@ class _KeyInputState extends State<KeyInput> {
     });
     gptController.addListener(() async{
       await KeyStorage.setKey(KeyStorage.chatGptKey, gptController.text);
+    });
+    deepLAPIKeyController.addListener(() async{
+      if(deepLAPIKeyController.text.isNotEmpty) {
+        tp.setDeepLApiKey(deepLAPIKeyController.text);
+      }
     });
     youtubeController.addListener(() async{
       if(youtubeController.text.isNotEmpty) {
@@ -47,6 +53,28 @@ class _KeyInputState extends State<KeyInput> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(left: 15, right: 15),
+                child: Icon(Icons.key, color: Colors.white, size: 30),
+              ),
+              Expanded(
+                child: TextField(
+                  maxLines: 1,
+                  controller: deepLAPIKeyController,
+                  cursorColor: Colors.grey.shade600,
+                  onSubmitted: (str){
+                    widget.onClose();
+                  },
+                  obscureText: true,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(border: InputBorder.none, hintText: 'Input deepL api key', hintStyle: TextStyle(color: Colors.grey.shade700)),
+                ),
+              ),
+              const SizedBox(width: 10,)
+            ],
+          ),
           Row(
             children: [
               const Padding(
