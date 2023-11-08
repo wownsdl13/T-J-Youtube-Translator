@@ -5,7 +5,7 @@ import 'package:youtube_translation/utils/global_extension.dart';
 import 'package:youtube_translation/utils/key_storage.dart';
 
 class UserHttps extends RootHttps {
-  UserHttps(super.googleSignInAccount);
+  UserHttps(super.googleSignIn);
 
   Future getRefreshToken(String accessToken) async {
     var result = await post('get_refresh_token', {'accessToken': accessToken});

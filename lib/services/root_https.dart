@@ -11,7 +11,7 @@ enum TokenType { access, refresh, none }
 typedef SendFunction = Future<http.Response> Function();
 
 abstract class RootHttps {
-  final GoogleSignInAccount googleSignInAccount;
+  final GoogleSignIn googleSignIn;
   // static String _baseURL = 'server.dogfoot.club';
   // static const String _subBaseURL = 'youtube-uploader-server';
   static String _baseURL = 'localhost:3003';
@@ -20,7 +20,7 @@ abstract class RootHttps {
   
   Uri uri(String url) => _path(url);
 
-  RootHttps(this.googleSignInAccount) {
+  RootHttps(this.googleSignIn) {
     _init(this);
   }
 
@@ -135,8 +135,8 @@ abstract class RootHttps {
       // unAuth
       if (tryToken) {
         if (await KeyStorage.hasRefreshToken) {
-          var getAccessToken = await UserHttps(googleSignInAccount).post('get_access_token', {
-            'accessToken': (await googleSignInAccount.authentication).accessToken,
+          var getAccessToken = await UserHttps(googleSignIn).post('get_access_token', {
+            'accessToken': await googleAccessToken,
           },
               tryToken: false,
               tokenType: TokenType.refresh); // 여기 tryToken 은 다른 것
@@ -177,6 +177,10 @@ abstract class RootHttps {
     if (session != null) {
       headers?['Authorization'] = 'Bearer $session';
     }
+  }
+
+  Future<String> get googleAccessToken async{
+    return (await (await googleSignIn.signInSilently())!.authentication).accessToken!;
   }
 
   Uri _path(

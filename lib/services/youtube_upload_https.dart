@@ -154,11 +154,11 @@ class YoutubeUploadHttps extends RootHttps {
         if (retry &&
             response.statusCode == 401 &&
             await KeyStorage.hasRefreshToken) {
-          var getAccessToken = await UserHttps(googleSignInAccount).post(
+          var getAccessToken = await UserHttps(googleSignIn).post(
               'get_access_token',
               {
                 'accessToken':
-                    (await googleSignInAccount.authentication).accessToken,
+                    await googleAccessToken,
               },
               tryToken: false,
               tokenType: TokenType.refresh);

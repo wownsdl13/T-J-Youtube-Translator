@@ -48,7 +48,7 @@ class TranslatorProvider extends ChangeNotifier {
   }
 
   void tagInit() {
-    UserHttps(_googleId!).getTags.then((value) {
+    UserHttps(_googleSignIn).getTags.then((value) {
       setTags = value;
       notifyListeners();
     });
@@ -62,23 +62,23 @@ class TranslatorProvider extends ChangeNotifier {
 
   void removeTag(String tag) {
     tags.remove(tag);
-    UserHttps(_googleId!).updateTags(tags);
+    UserHttps(_googleSignIn).updateTags(tags);
     notifyListeners();
   }
 
   void addTag(String tag) {
     tags.add(tag);
-    UserHttps(_googleId!).updateTags(tags);
+    UserHttps(_googleSignIn).updateTags(tags);
     notifyListeners();
   }
 
   void setYoutubeApiKey(String key) {
-    UserHttps(_googleId!).updateYoutubeApiKey(key);
+    UserHttps(_googleSignIn).updateYoutubeApiKey(key);
   }
 
 
   void setDeepLApiKey(String key) {
-    UserHttps(_googleId!).updateDeepLApiKey(key);
+    UserHttps(_googleSignIn).updateDeepLApiKey(key);
   }
 
   String _languageCode = OneTranslateModel.en;
@@ -91,19 +91,19 @@ class TranslatorProvider extends ChangeNotifier {
   }
 
   Future<String> get getTitleHeader async {
-    return await UserHttps(_googleId!).getTitleHeader;
+    return await UserHttps(_googleSignIn).getTitleHeader;
   }
 
   Future setTitleHeader(String txt) async {
-    return await UserHttps(_googleId!).updateTitleHeader(txt);
+    return await UserHttps(_googleSignIn).updateTitleHeader(txt);
   }
 
   Future<String> get getDescriptionHeader async {
-    return await UserHttps(_googleId!).getDescriptionHeader;
+    return await UserHttps(_googleSignIn).getDescriptionHeader;
   }
 
   Future setDescriptionHeader(String txt) async {
-    return await UserHttps(_googleId!).updateDescriptionHeader(txt);
+    return await UserHttps(_googleSignIn).updateDescriptionHeader(txt);
   }
 
   var _title = '';
@@ -311,7 +311,7 @@ class TranslatorProvider extends ChangeNotifier {
   Future login() async {
     _googleId = await _googleSignIn.signIn();
     if (_googleId != null) {
-      await UserHttps(_googleId!)
+      await UserHttps(_googleSignIn)
           .getRefreshToken((await _googleId!.authentication).accessToken!);
       tagInit();
     }
@@ -340,7 +340,7 @@ class TranslatorProvider extends ChangeNotifier {
     if (isLogin &&
         readyToUpload) {
       await WakelockPlus.enable();
-      var oAuthToken = (await _googleId!.authentication).accessToken;
+      var oAuthToken = (await (await _googleSignIn.signInSilently())!.authentication).accessToken;
       if (oAuthToken != null) {
         _uploadPercentage = UploadPercentageModel('uploading video');
         notifyListeners();
@@ -348,7 +348,7 @@ class TranslatorProvider extends ChangeNotifier {
         String? videoId;
         switch (_videoInputType) {
           case VideoInputType.file:
-            videoId = await YoutubeUploadHttps(oAuthToken, _googleId!)
+            videoId = await YoutubeUploadHttps(oAuthToken, _googleSignIn)
                 .uploadVideo(
                     _videoUploadModel!.videoStream,
                     _videoUploadModel!.size,
@@ -369,12 +369,12 @@ class TranslatorProvider extends ChangeNotifier {
             _uploadPercentage!.setText = 'uploading localizations';
             notifyListeners();
             if(localizations != null) {
-              await YoutubeUploadHttps(oAuthToken, _googleId!)
+              await YoutubeUploadHttps(oAuthToken, _googleSignIn)
                   .setVideoLocalizations(videoId, localizations);
             }
             _uploadPercentage!.setText = 'uploading thumbnail';
             notifyListeners();
-            var youtubeUploadHttps = YoutubeUploadHttps(oAuthToken, _googleId!);
+            var youtubeUploadHttps = YoutubeUploadHttps(oAuthToken, _googleSignIn);
             if (_thumbnail != null) {
               await youtubeUploadHttps.setThumbnail(videoId, thumbnail);
             }
@@ -383,14 +383,14 @@ class TranslatorProvider extends ChangeNotifier {
               notifyListeners();
               for (var lang in OneTranslateModel.langList) {
                 var srt = _generateSrt(lang);
-                await YoutubeUploadHttps(oAuthToken, _googleId!)
+                await YoutubeUploadHttps(oAuthToken, _googleSignIn)
                     .uploadCaption(videoId, lang, srt);
               }
             }
             if (_comment.trim().isNotEmpty) {
               _uploadPercentage!.setText = 'uploading comment';
               notifyListeners();
-              await YoutubeUploadHttps(oAuthToken, _googleId!)
+              await YoutubeUploadHttps(oAuthToken, _googleSignIn)
                   .postComment(videoId, _comment.trim());
             }
           }

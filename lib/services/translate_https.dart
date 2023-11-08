@@ -36,17 +36,19 @@ class TranslateHttps {
                   "messages": [
                     {
                       "role": "user",
-                      "content": """
-          translate text following these rules : translate languages are ${OneTranslateModel.langList.join(', ')}. form is {"ko":..., ...}. keep original if it's same language. Speak informally, Maintain the line breaks. Respond only json:
-          $srtTxt
-          """
+                      "content": """{
+  "question": "Translate the following text: $srtTxt",
+  "target_languages": [${OneTranslateModel.langList.map((e) => '"$e"').toList().join(', ')}],
+  "format": “json : {“ko”:…, }”
+}""",
                     }
                   ],
                   "temperature": 0,
-                  'max_tokens': 4096
+                  'max_tokens': 4096,
+                  'response_format': { 'type': 'json_object' },
                 }))
             .timeout(const Duration(seconds: 620));
-        await Future.delayed(const Duration(seconds: 2));
+        await Future.delayed(const Duration(seconds: 5));
         if (result.statusCode == 200) {
           var gpt =
               GptResponse.fromJson(jsonDecode(utf8.decode(result.bodyBytes)));
@@ -77,7 +79,7 @@ class TranslateHttps {
   static Future<void> translateTxtList(
       List<OneSrtModel> srtList, TranslateCallback callback) async {
     // 동시 실행할 수 있는 최대 작업 수입니다.
-    const maxConcurrentTasks = 1;
+    const maxConcurrentTasks = 10;
 
     // 동시에 처리할 수 있는 작업 수를 제어하는 카운터.
     var runningTasks = 0;
