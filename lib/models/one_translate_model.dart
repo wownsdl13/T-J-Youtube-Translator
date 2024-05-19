@@ -71,7 +71,6 @@ class OneTranslateModel {
       return _convert(_translations[languageCode]!);
     } else {
       if(_translations[languageCode] == null) {
-        print('..?? > ${languageCode}, ${_translations}');
       }
       return _translations[languageCode]!;
     }
@@ -87,7 +86,7 @@ class OneTranslateModel {
     return text;
   }
 
-  bool _quotes = false;
+  bool _quotes = true;
 
   bool get quotes => _quotes;
 

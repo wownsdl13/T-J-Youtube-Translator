@@ -29,7 +29,7 @@ class LoginScreen extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'T & J Youtube uploader v.1.0.0',
+                      'Alien Youtube uploader v.1.1.0',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.pacifico(color: Colors.white, fontSize: 40),
                     ),

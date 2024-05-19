@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:youtube_translation/models/one_translate_model.dart';
 import 'package:youtube_translation/screens/translator_screen/local_utils/translator_provider.dart';
 import 'package:youtube_translation/screens/translator_screen/local_widgets/comment_widget.dart';
+import 'package:youtube_translation/screens/translator_screen/local_widgets/description_blog_post_widget.dart';
 import 'package:youtube_translation/screens/translator_screen/local_widgets/description_translate_widget.dart';
 import 'package:youtube_translation/screens/translator_screen/local_widgets/drag_drop.dart';
 import 'package:youtube_translation/screens/translator_screen/local_widgets/description_header_widget.dart';
@@ -67,7 +68,7 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              'T & J Youtube uploader v.1.0.0',
+                              'Alien Youtube uploader v.1.1.0',
                               textAlign: TextAlign.center,
                               style:
                                   TextStyle(color: Colors.white, fontSize: 20),
@@ -164,13 +165,15 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
                                                 ? Image.memory(tp.thumbnail,
                                                     fit: BoxFit.cover)
                                                 : Container()),
-                                        const SizedBox(height: 50),
+                                        const SizedBox(height: 30),
                                         const TitleHeaderWidget(),
                                         const SizedBox(height: 30),
                                         const DescriptionHeaderWidget(),
                                         const SizedBox(height: 30),
                                         const CommentWidget(),
-                                        const SizedBox(height: 50),
+                                        const SizedBox(height: 30),
+                                        const DescriptionBlogPostWidget(),
+                                        const SizedBox(height: 30),
                                         const TagWidget(),
                                       ],
                                     ),

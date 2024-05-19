@@ -31,8 +31,12 @@ class UserHttps extends RootHttps {
     var result = await post('update_youtube_api_key', {'key':key});
   }
 
-  Future updateDeepLApiKey(String key) async{
-    var result = await post('update_deepl_api_key', {'key':key});
+  Future<String?> get getYoutubeApiKey async{
+    var result = await get('get_youtube_api_key');
+    if(result.isOk){
+      return jsonDecode(result.body)['youtubeApiKey'];
+    }
+    return '';
   }
 
   Future updateTitleHeader(String txt) async{
@@ -56,6 +60,18 @@ class UserHttps extends RootHttps {
     var result = await get('get_description_header');
     if(result.isOk){
       return jsonDecode(result.body)['descriptionHeader'];
+    }
+    return '';
+  }
+
+  Future updateOpenAiApiKey(String key) async{
+    var result = await post('update_open_ai_api_key', {'key':key});
+  }
+
+  Future<String?> get getOpenAiApiKey async{
+    var result = await get('get_open_ai_api_key');
+    if(result.isOk){
+      return jsonDecode(result.body)['openAiApiKey'];
     }
     return '';
   }

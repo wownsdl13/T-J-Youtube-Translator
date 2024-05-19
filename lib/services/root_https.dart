@@ -13,8 +13,8 @@ typedef SendFunction = Future<http.Response> Function();
 abstract class RootHttps {
   final GoogleSignIn googleSignIn;
   // static String _baseURL = 'server.dogfoot.club';
-  // static const String _subBaseURL = 'youtube-uploader-server';
   static String _baseURL = 'localhost:3003';
+  static const String _subBaseURL = 'youtube-uploader-server';
 
   static set setBaseURL(String baseURL) => _baseURL = baseURL;
   
@@ -187,7 +187,7 @@ abstract class RootHttps {
       String url, {
         Map<String, dynamic>? query,
       }){
-    // return Uri.https(_baseURL, '$_subBaseURL/$path/$url', query);
+    // return Uri.https(_baseURL, '$path/$url', query);
     return Uri.http(_baseURL, '$path/$url', query);
   }
 }

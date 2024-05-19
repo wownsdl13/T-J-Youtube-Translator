@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
-import 'package:youtube_translation/models/multiple_srt_model.dart';
-import 'package:youtube_translation/models/one_srt_model.dart';
 import 'package:youtube_translation/models/one_translate_model.dart';
+import 'package:youtube_translation/models/translates_model.dart';
 import 'package:youtube_translation/models/upload_percentage_model.dart';
 import 'package:youtube_translation/models/video_upload_model.dart';
 import 'package:youtube_translation/services/translate_https.dart';
@@ -27,6 +26,15 @@ class TranslatorProvider extends ChangeNotifier {
   String _videoId = '';
 
   String get videoId => _videoId;
+
+  String _blogPostLink = '';
+
+  String get blogPostLink => _blogPostLink;
+
+  set setBlogPostLink(String link) {
+    _blogPostLink = link;
+    notifyListeners();
+  }
 
   set setVideoId(String text) {
     _videoId = text;
@@ -76,9 +84,16 @@ class TranslatorProvider extends ChangeNotifier {
     UserHttps(_googleSignIn).updateYoutubeApiKey(key);
   }
 
+  Future<String?> get getYoutubeApiKey async {
+    return await UserHttps(_googleSignIn).getYoutubeApiKey;
+  }
 
-  void setDeepLApiKey(String key) {
-    UserHttps(_googleSignIn).updateDeepLApiKey(key);
+  void setOpenAiApiKey(String key) {
+    UserHttps(_googleSignIn).updateOpenAiApiKey(key);
+  }
+
+  Future<String?> get getOpenAiApiKey async {
+    return await UserHttps(_googleSignIn).getOpenAiApiKey;
   }
 
   String _languageCode = OneTranslateModel.en;
@@ -116,13 +131,13 @@ class TranslatorProvider extends ChangeNotifier {
   bool get translatingTitle => _translatingTitle;
 
   Future translateTitle(String controllerText) async {
-    if (!translatingTitle &&
-        _title != controllerText &&
-        await KeyStorage.hasKey(KeyStorage.chatGptKey)) {
+    var openAiApiKey = await getOpenAiApiKey;
+    if (!translatingTitle && _title != controllerText && openAiApiKey != null) {
       _title = controllerText;
       _translatingTitle = true;
       notifyListeners();
-      _translatedTitle = await TranslateHttps.translateTxt(_title);
+      _translatedTitle =
+          await TranslateHttps.translateTxt(_title, openAiApiKey: openAiApiKey);
       _translatingTitle = false;
       notifyListeners();
     }
@@ -138,13 +153,15 @@ class TranslatorProvider extends ChangeNotifier {
   bool get translatingDescription => _translatingDescription;
 
   Future translateDescription(String controllerText) async {
+    var openAiApiKey = await getOpenAiApiKey;
     if (!translatingDescription &&
         _description != controllerText &&
-        await KeyStorage.hasKey(KeyStorage.chatGptKey)) {
+        openAiApiKey != null) {
       _description = controllerText;
       _translatingDescription = true;
       notifyListeners();
-      _translatedDescription = await TranslateHttps.translateTxt(_description);
+      _translatedDescription = await TranslateHttps.translateTxt(_description,
+          openAiApiKey: openAiApiKey);
       _translatingDescription = false;
       notifyListeners();
     }
@@ -155,7 +172,8 @@ class TranslatorProvider extends ChangeNotifier {
   bool get readingSrt => _readingSrt;
 
   Future readSrt(Uint8List data) async {
-    if (!_readingSrt && await KeyStorage.hasKey(KeyStorage.chatGptKey)) {
+    var openAiApiKey = await getOpenAiApiKey;
+    if (!_readingSrt && openAiApiKey != null) {
       _readingSrt = true;
       notifyListeners();
       var txt = utf8.decode(data);
@@ -180,7 +198,8 @@ class TranslatorProvider extends ChangeNotifier {
       //   notifyListeners();
       // }
 
-      await TranslateHttps.translateTxtList(list, (srtModel, translatedText) {
+      await TranslateHttps.translateTxtList(openAiApiKey: openAiApiKey, list,
+          (srtModel, translatedText) {
         srtList.add(OneTranslateModel(
           order: srtModel.order,
           period: srtModel.time,
@@ -267,10 +286,12 @@ class TranslatorProvider extends ChangeNotifier {
   }
 
   bool get readyToUpload {
-    switch(videoInputType){
+    switch (videoInputType) {
       case VideoInputType.file:
         // TODO: Handle this case.
-        return hasVideo && _translatedTitle != null && _translatedDescription != null;
+        return hasVideo &&
+            _translatedTitle != null &&
+            _translatedDescription != null;
       case VideoInputType.videoId:
         return videoId.isNotEmpty;
     }
@@ -334,13 +355,12 @@ class TranslatorProvider extends ChangeNotifier {
 
   bool get isUploading => _uploadPercentage != null;
 
-
-
   Future upload() async {
-    if (isLogin &&
-        readyToUpload) {
+    if (isLogin && readyToUpload) {
       await WakelockPlus.enable();
-      var oAuthToken = (await (await _googleSignIn.signInSilently())!.authentication).accessToken;
+      var oAuthToken =
+          (await (await _googleSignIn.signInSilently())!.authentication)
+              .accessToken;
       if (oAuthToken != null) {
         _uploadPercentage = UploadPercentageModel('uploading video');
         notifyListeners();
@@ -349,11 +369,9 @@ class TranslatorProvider extends ChangeNotifier {
         switch (_videoInputType) {
           case VideoInputType.file:
             videoId = await YoutubeUploadHttps(oAuthToken, _googleSignIn)
-                .uploadVideo(
-                    _videoUploadModel!.videoStream,
-                    _videoUploadModel!.size,
-                    tags,
-                    localizations!, uploadProgressCallback: (double percentage) {
+                .uploadVideo(_videoUploadModel!.videoStream,
+                    _videoUploadModel!.size, tags, localizations!,
+                    uploadProgressCallback: (double percentage) {
               var p = (percentage * 100).floor();
               _uploadPercentage!.setPercentage = p;
               notifyListeners();
@@ -368,13 +386,14 @@ class TranslatorProvider extends ChangeNotifier {
           if (oAuthToken != null) {
             _uploadPercentage!.setText = 'uploading localizations';
             notifyListeners();
-            if(localizations != null) {
+            if (localizations != null) {
               await YoutubeUploadHttps(oAuthToken, _googleSignIn)
                   .setVideoLocalizations(videoId, localizations);
             }
             _uploadPercentage!.setText = 'uploading thumbnail';
             notifyListeners();
-            var youtubeUploadHttps = YoutubeUploadHttps(oAuthToken, _googleSignIn);
+            var youtubeUploadHttps =
+                YoutubeUploadHttps(oAuthToken, _googleSignIn);
             if (_thumbnail != null) {
               await youtubeUploadHttps.setThumbnail(videoId, thumbnail);
             }
@@ -408,20 +427,39 @@ class TranslatorProvider extends ChangeNotifier {
     if (titleHeader.isNotEmpty) {
       titleHeader += ' ';
     }
+
     String descriptionHeader = (await getDescriptionHeader).trim();
     if (descriptionHeader.isNotEmpty) {
-      descriptionHeader += '\n\n\n';
+      descriptionHeader += '\n\n';
     }
     if (_translatedTitle != null && _translatedDescription != null) {
       for (var lang in OneTranslateModel.langList) {
+        String blogPostLink = translateBlogPostLink(lang);
         localizations[lang] = {
           'title': '$titleHeader${_translatedTitle![lang]!}',
-          'description': descriptionHeader + _translatedDescription![lang]!,
+          'description':
+              blogPostLink + descriptionHeader + _translatedDescription![lang]!,
         };
       }
       return localizations;
     } else {
       return null;
     }
+  }
+
+  String translateBlogPostLink(String targetLang){
+    String blogPostLink = _blogPostLink.trim();
+    if (blogPostLink.isNotEmpty) {
+      for (var exampleLang in OneTranslateModel.langList) {
+        var routerLang = '/$exampleLang/';
+        if (blogPostLink.contains(routerLang)) {
+          blogPostLink =
+          '${TranslatesModel(targetLang).blogStory} : ${blogPostLink.replaceFirst(routerLang, '/$targetLang/')}\n\n';
+          break;
+        }
+      } // 귀찮아서 안했지만, 여기에도 없는 언어로 하면 한 언어로 다 들어가져버리는 버그가 있을꺼다.
+      // 하지만 왠만하면 영어, 한국어 사이에서 넣을꺼기때문에 괜찮을듯
+    }
+    return blogPostLink;
   }
 }
