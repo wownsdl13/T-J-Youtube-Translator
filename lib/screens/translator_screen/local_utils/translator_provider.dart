@@ -449,17 +449,21 @@ class TranslatorProvider extends ChangeNotifier {
 
   String translateBlogPostLink(String targetLang){
     String blogPostLink = _blogPostLink.trim();
-    if (blogPostLink.isNotEmpty) {
-      for (var exampleLang in OneTranslateModel.langList) {
-        var routerLang = '/$exampleLang/';
-        if (blogPostLink.contains(routerLang)) {
-          blogPostLink =
-          '${TranslatesModel(targetLang).blogStory} : ${blogPostLink.replaceFirst(routerLang, '/$targetLang/')}\n\n';
-          break;
-        }
-      } // 귀찮아서 안했지만, 여기에도 없는 언어로 하면 한 언어로 다 들어가져버리는 버그가 있을꺼다.
-      // 하지만 왠만하면 영어, 한국어 사이에서 넣을꺼기때문에 괜찮을듯
+    var blogTargetLang = targetLang;
+    if(OneTranslateModel.blogLangList.contains(targetLang)){
+      blogTargetLang = OneTranslateModel.en; // 블로그 지원이 안되는
     }
+      if (blogPostLink.isNotEmpty) {
+        for (var exampleLang in OneTranslateModel.langList) {
+          var routerLang = '/$exampleLang/';
+          if (blogPostLink.contains(routerLang)) {
+            blogPostLink =
+            '${TranslatesModel(targetLang).blogStory} : ${blogPostLink
+                .replaceFirst(routerLang, '/$blogTargetLang/')}\n\n';
+            break;
+          }
+        }
+      }
     return blogPostLink;
   }
 }
