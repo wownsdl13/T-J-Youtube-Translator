@@ -1,29 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:youtube_translation/screens/translator_screen/local_utils/translator_provider.dart';
-import 'package:youtube_translation/utils/key_storage.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_translation/screens/translator_screen/translator_provider/translator_provider.dart';
 
-class TitleHeaderWidget extends StatefulWidget {
+class TitleHeaderWidget extends ConsumerStatefulWidget {
   const TitleHeaderWidget({Key? key}) : super(key: key);
 
   @override
-  State<TitleHeaderWidget> createState() => _TitleHeaderWidgetState();
+  ConsumerState<TitleHeaderWidget> createState() => _TitleHeaderWidgetState();
 }
 
-class _TitleHeaderWidgetState extends State<TitleHeaderWidget> {
+class _TitleHeaderWidgetState extends ConsumerState<TitleHeaderWidget> {
   final textEditingController = TextEditingController();
 
   @override
   void initState() {
     // TODO: implement initState
-    var tp = context.read<TranslatorProvider>();
-    tp.getTitleHeader.then((value){
+    var t = ref.read(translatorProvider);
+    t.translatorDataState.getTitleHeader.then((value) {
+      print('value > ${value}');
       setState(() {
-        textEditingController.text = value ?? '';
+        textEditingController.text = value;
       });
     });
-    textEditingController.addListener(() async{
-      await tp.setTitleHeader(textEditingController.text);
+    textEditingController.addListener(() async {
+      var ts = ref.read(translatorProvider.notifier);
+      await ts.setTitleHeader(textEditingController.text);
     });
     super.initState();
   }

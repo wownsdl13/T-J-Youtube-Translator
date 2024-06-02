@@ -1,0 +1,4 @@
+enum GetSubtitleDirection{
+  next,
+  previous
+}

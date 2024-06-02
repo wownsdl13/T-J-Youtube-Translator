@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:youtube_translation/screens/translator_screen/local_utils/translator_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_translation/screens/translator_screen/translator_provider/translator_provider.dart';
 
-class UploadBtn extends StatelessWidget {
+class UploadBtn extends ConsumerWidget {
   const UploadBtn({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    var tp = context.watch<TranslatorProvider>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    var ts = ref.watch(translatorProvider);
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () {
-        tp.download();
+        var t = ref.read(translatorProvider.notifier);
+        t.download();
       },
       child: Container(
         margin: const EdgeInsets.only(top: 20, left: 100, bottom: 5),
@@ -30,7 +31,7 @@ class UploadBtn extends StatelessWidget {
                     style: TextStyle(color: Colors.grey.shade700, fontSize: 14),
                   ),
                   Checkbox(
-                    value: tp.addOriginal,
+                    value: ts.addOriginal,
                     checkColor: Colors.white,
                     fillColor: MaterialStateProperty.resolveWith<Color>(
                           (Set<MaterialState> states) {
@@ -50,7 +51,8 @@ class UploadBtn extends StatelessWidget {
                     ),
                     onChanged: (check) {
                       if(check != null) {
-                        tp.setAddOriginal = check;
+                        var t = ref.watch(translatorProvider.notifier);
+                        t.setAddOriginal = check;
                       }
                     },
                   )
@@ -60,7 +62,8 @@ class UploadBtn extends StatelessWidget {
             GestureDetector(
               behavior: HitTestBehavior.translucent,
               onTap: (){
-                tp.download();
+                var t = ref.watch(translatorProvider.notifier);
+                t.download();
               },
               child: Container(
                 padding: const EdgeInsets.fromLTRB(23, 10, 23, 10),
@@ -73,13 +76,14 @@ class UploadBtn extends StatelessWidget {
             ),
             const SizedBox(height: 30),
             IgnorePointer(
-              ignoring: !tp.readyToUpload,
+              ignoring: !ts.readyToUpload,
               child: Opacity(
-                opacity: tp.readyToUpload?1:.3,
+                opacity: ts.readyToUpload?1:.3,
                 child: GestureDetector(
                   behavior: HitTestBehavior.translucent,
                   onTap: (){
-                    tp.upload();
+                    var t = ref.read(translatorProvider.notifier);
+                    t.upload();
                   },
                   child: Container(
                     padding: const EdgeInsets.fromLTRB(30, 13, 30, 13),

@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:youtube_translation/screens/translator_screen/local_utils/translator_provider.dart';
-import 'package:youtube_translation/utils/key_storage.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_translation/screens/translator_screen/translator_provider/translator_provider.dart';
 
-class DescriptionBlogPostWidget extends StatefulWidget {
+class DescriptionBlogPostWidget extends ConsumerStatefulWidget {
   const DescriptionBlogPostWidget({Key? key}) : super(key: key);
 
   @override
-  State<DescriptionBlogPostWidget> createState() => _DescriptionBlogPostWidgetState();
+  ConsumerState<DescriptionBlogPostWidget> createState() => _DescriptionBlogPostWidgetState();
 }
 
-class _DescriptionBlogPostWidgetState extends State<DescriptionBlogPostWidget> {
+class _DescriptionBlogPostWidgetState extends ConsumerState<DescriptionBlogPostWidget> {
   final textEditingController = TextEditingController();
 
   @override
   void initState() {
     // TODO: implement initState
-    var tp = context.read<TranslatorProvider>();
     textEditingController.addListener(() async{
-      tp.setBlogPostLink = textEditingController.text.trim();
+    var t = ref.read(translatorProvider.notifier);
+      t.setBlogPostLink = textEditingController.text.trim();
     });
     super.initState();
   }

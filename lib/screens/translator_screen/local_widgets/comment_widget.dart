@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:youtube_translation/screens/translator_screen/local_utils/translator_provider.dart';
-import 'package:youtube_translation/utils/key_storage.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_translation/screens/translator_screen/translator_provider/translator_provider.dart';
 
-class CommentWidget extends StatefulWidget {
+class CommentWidget extends ConsumerStatefulWidget {
   const CommentWidget({Key? key}) : super(key: key);
 
   @override
-  State<CommentWidget> createState() => _CommentWidgetState();
+  ConsumerState<CommentWidget> createState() => _CommentWidgetState();
 }
 
-class _CommentWidgetState extends State<CommentWidget> {
+class _CommentWidgetState extends ConsumerState<CommentWidget> {
   final textEditingController = TextEditingController();
 
   @override
   void initState() {
     // TODO: implement initState
-    var tp = context.read<TranslatorProvider>();
     textEditingController.addListener((){
-      tp.setComment = textEditingController.text;
+      var t = ref.read(translatorProvider.notifier);
+      t.setComment = textEditingController.text;
     });
     super.initState();
   }

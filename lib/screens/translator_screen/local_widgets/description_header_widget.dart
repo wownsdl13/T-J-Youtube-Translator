@@ -1,29 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:youtube_translation/screens/translator_screen/local_utils/translator_provider.dart';
-import 'package:youtube_translation/utils/key_storage.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_translation/screens/translator_screen/translator_provider/translator_provider.dart';
 
-class DescriptionHeaderWidget extends StatefulWidget {
+class DescriptionHeaderWidget extends ConsumerStatefulWidget {
   const DescriptionHeaderWidget({Key? key}) : super(key: key);
 
   @override
-  State<DescriptionHeaderWidget> createState() => _DescriptionHeaderWidgetState();
+  ConsumerState<DescriptionHeaderWidget> createState() => _DescriptionHeaderWidgetState();
 }
 
-class _DescriptionHeaderWidgetState extends State<DescriptionHeaderWidget> {
+class _DescriptionHeaderWidgetState extends ConsumerState<DescriptionHeaderWidget> {
   final textEditingController = TextEditingController();
 
   @override
   void initState() {
     // TODO: implement initState
-    var tp = context.read<TranslatorProvider>();
-    tp.getDescriptionHeader.then((value){
+    var ts = ref.read(translatorProvider);
+    ts.translatorDataState.getDescriptionHeader.then((value){
       setState(() {
         textEditingController.text = value ?? '';
       });
     });
     textEditingController.addListener(() async{
-      await tp.setDescriptionHeader(textEditingController.text);
+      var t = ref.read(translatorProvider.notifier);
+      t.setDescriptionHeader(textEditingController.text);
     });
     super.initState();
   }

@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-import 'package:youtube_translation/screens/translator_screen/local_utils/translator_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_translation/screens/translator_screen/translator_provider/translator_provider.dart';
 
-class VideoIdWidget extends StatefulWidget {
+class VideoIdWidget extends ConsumerStatefulWidget {
   const VideoIdWidget({Key? key}) : super(key: key);
 
   @override
-  State<VideoIdWidget> createState() => _VideoIdWidgetState();
+  ConsumerState<VideoIdWidget> createState() => _VideoIdWidgetState();
 }
 
-class _VideoIdWidgetState extends State<VideoIdWidget> {
+class _VideoIdWidgetState extends ConsumerState<VideoIdWidget> {
   final textEditingController = TextEditingController();
 
   @override
   void initState() {
     // TODO: implement initState
-    var tp = context.read<TranslatorProvider>();
-    textEditingController.text = tp.videoId;
+    var ts = ref.read(translatorProvider);
+    var t = ref.read(translatorProvider.notifier);
+    textEditingController.text = ts.translatorDataState.videoId;
     textEditingController.addListener(() {
-      tp.setVideoId = textEditingController.text.trim();
+      t.setVideoId = textEditingController.text.trim();
     });
     super.initState();
   }
@@ -44,7 +44,7 @@ class _VideoIdWidgetState extends State<VideoIdWidget> {
           width: 10,
         ),
         Container(
-          width: 250,
+            width: 250,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(width: 1, color: Colors.white)),

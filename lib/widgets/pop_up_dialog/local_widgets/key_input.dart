@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:youtube_translation/screens/translator_screen/local_utils/translator_provider.dart';
-import 'package:youtube_translation/utils/key_storage.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_translation/provider/screen_provider/screen_provider.dart';
+import 'package:youtube_translation/screens/translator_screen/translator_provider/translator_provider.dart';
 
-class KeyInput extends StatefulWidget {
+class KeyInput extends ConsumerStatefulWidget {
   const KeyInput({Key? key, required this.onClose}) : super(key: key);
   final GestureTapCallback onClose;
 
@@ -11,29 +11,31 @@ class KeyInput extends StatefulWidget {
   _KeyInputState createState() => _KeyInputState();
 }
 
-class _KeyInputState extends State<KeyInput> {
+class _KeyInputState extends ConsumerState<KeyInput> {
   final openAiController = TextEditingController();
   final youtubeController = TextEditingController();
 
   @override
   void initState() {
     // TODO: implement initState
-    var tp = context.read<TranslatorProvider>();
-    tp.getYoutubeApiKey.then((value) {
-      youtubeController.text = value ?? '';
+    var ts = ref.read(translatorProvider);
+    ts.getYoutubeApiKey.then((key) {
+      var t = ref.read(translatorProvider.notifier);
+      t.setYoutubeApiKey(key);
     });
     youtubeController.addListener(() async {
       if (youtubeController.text.isNotEmpty) {
-        tp.setYoutubeApiKey(youtubeController.text);
+        var t = ref.read(translatorProvider.notifier);
+        t.setYoutubeApiKey(youtubeController.text);
       }
     });
-    tp.getOpenAiApiKey.then((value) {
-      print('value > $value');
-      openAiController.text = value ?? '';
+    ref.read(screenProvider).getOpenAiApiKey.then((value) {
+      openAiController.text = value;
     });
     openAiController.addListener(() async {
       if (openAiController.text.isNotEmpty) {
-        tp.setOpenAiApiKey(openAiController.text);
+        var t = ref.read(translatorProvider.notifier);
+        t.setOpenAiApiKey(openAiController.text);
       }
     });
     super.initState();

@@ -1,33 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:youtube_translation/models/one_translate_model.dart';
-import 'package:youtube_translation/screens/translator_screen/local_utils/translator_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_translation/models/one_translate/enum/subtitle_one_type.dart';
+import 'package:youtube_translation/models/one_translate/one_translate.dart';
+import 'package:youtube_translation/provider/screen_provider/screen_provider.dart';
+import 'package:youtube_translation/screens/translator_screen/translator_provider/translator_provider.dart';
+import 'package:youtube_translation/utils/languages.dart';
 
-class OneTranslateItem extends StatefulWidget {
-  const OneTranslateItem({Key? key, required this.oneTranslateModel, required this.translatedText}) : super(key: key);
-  final OneTranslateModel oneTranslateModel;
+class OneTranslateItem extends ConsumerStatefulWidget {
+  const OneTranslateItem(
+      {Key? key, required this.oneTranslate, required this.translatedText})
+      : super(key: key);
+  final OneTranslate oneTranslate;
   final String translatedText;
 
   @override
-  State<OneTranslateItem> createState() => _OneTranslateItemState();
+  ConsumerState<OneTranslateItem> createState() => _OneTranslateItemState();
 }
 
-class _OneTranslateItemState extends State<OneTranslateItem> {
+class _OneTranslateItemState extends ConsumerState<OneTranslateItem> {
   final textEditingController = TextEditingController();
 
   @override
   void initState() {
     // TODO: implement initState
     textEditingController.text = widget.translatedText;
-    textEditingController.addListener(() => setState(() {
-
-    }));
+    textEditingController.addListener((){
+      var t = ref.read(translatorProvider.notifier);
+      t.setLang(widget.oneTranslate,
+          languageCode: ref.read(screenProvider).languageCode,
+          text: textEditingController.text);
+    });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    var tp = context.watch<TranslatorProvider>();
+    var ts = ref.watch(translatorProvider);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -40,7 +48,7 @@ class _OneTranslateItemState extends State<OneTranslateItem> {
                     minWidth: 50,
                   ),
                   child: Text(
-                    widget.oneTranslateModel.order.toString(),
+                    widget.oneTranslate.order.toString(),
                     textAlign: TextAlign.center,
                     style: const TextStyle(color: Colors.white, fontSize: 14),
                   )),
@@ -48,19 +56,19 @@ class _OneTranslateItemState extends State<OneTranslateItem> {
                   child: Padding(
                 padding: const EdgeInsets.fromLTRB(0, 12, 5, 12),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.oneTranslateModel.period,
-                      style: TextStyle(
-                          color: Colors.grey.shade700, fontSize: 14),
+                      widget.oneTranslate.period,
+                      style:
+                          TextStyle(color: Colors.grey.shade700, fontSize: 14),
                     ),
                     const SizedBox(
                       height: 2,
                     ),
                     Text(
-                      widget.oneTranslateModel.getLang(OneTranslateModel.original),
+                      widget.oneTranslate.getLang(Languages.original),
                       style: const TextStyle(color: Colors.white, fontSize: 14),
                     ),
                     const SizedBox(height: 5),
@@ -69,7 +77,10 @@ class _OneTranslateItemState extends State<OneTranslateItem> {
                       maxLines: null,
                       cursorColor: Colors.grey.shade400,
                       style: const TextStyle(color: Colors.white, fontSize: 14),
-                      decoration: const InputDecoration(isDense: true, border: InputBorder.none),
+                      decoration: InputDecoration(
+                        hintText: 'Empty',
+                          hintStyle: TextStyle(color: Colors.grey.shade600),
+                          isDense: true, border: InputBorder.none),
                     ),
                   ],
                 ),
@@ -78,105 +89,67 @@ class _OneTranslateItemState extends State<OneTranslateItem> {
                 width: 1,
                 color: Colors.white,
               ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Text('"',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 17)),
-                          Checkbox(
-                            value: widget.oneTranslateModel.quotes,
-                            checkColor: Colors.white,
-                            fillColor: MaterialStateProperty.resolveWith<Color>(
-                                  (Set<MaterialState> states) {
-                                if (states.contains(MaterialState.selected)) {
-                                  return Colors.green; // 선택된 상태에서의 배경색ㅡ
-                                }
-                                return Colors.transparent;
-                              },
-                            ),
-                            side: MaterialStateBorderSide.resolveWith(
-                                  (states){
-                                if (states.contains(MaterialState.selected)) {
-                                  return const BorderSide(width: 1.2, color: Colors.transparent);
-                                }
-                                return const BorderSide(width: 1.2, color: Colors.white);
-                              },
-                            ),
-                            onChanged: (check) {
-                              if(check != null) {
-                                tp.changeQuotes(widget.oneTranslateModel, check);
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                      const SizedBox(width: 15),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Text('(',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 17)),
-                          Checkbox(
-                            value: widget.oneTranslateModel.bracket,
-                            checkColor: Colors.white,
-                            fillColor: MaterialStateProperty.resolveWith<Color>(
-                                  (Set<MaterialState> states) {
-                                if (states.contains(MaterialState.selected)) {
-                                  return Colors.green; // 선택된 상태에서의 배경색ㅡ
-                                }
-                                return Colors.transparent;
-                              },
-                            ),
-                            side: MaterialStateBorderSide.resolveWith(
-                                  (states){
-                                    if (states.contains(MaterialState.selected)) {
-                                      return const BorderSide(width: 1.2, color: Colors.transparent);
-                                    }
-                                    return const BorderSide(width: 1.2, color: Colors.white);
-                                  },
-                            ),
-                            onChanged: (check) {
-                              if(check != null) {
-                                tp.changeBracket(widget.oneTranslateModel, check);
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                      const SizedBox(width: 15)
-                    ],
-                  ),
-                  const SizedBox(height: 5),
-                  Opacity(
-                    opacity: textEditingController.text == widget.translatedText?0.2:1,
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.translucent,
-                      onTap: (){
-                        tp.changeSubTxt(widget.oneTranslateModel, textEditingController.text);
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.only(right: 10),
-                        padding: const EdgeInsets.fromLTRB(22, 6, 22, 6),
-                        decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.white), borderRadius: BorderRadius.circular(8)),
-                        child: const Text('Save', style: TextStyle(color: Colors.white),),
-                      ),
-                    ),
-                  )
-                ],
-              )
+              selectOneTranslateWidget
             ],
           ),
         ),
         const Divider(height: 1, thickness: 1, color: Colors.white)
       ],
+    );
+  }
+
+  Widget get selectOneTranslateWidget {
+    double radius = 8;
+    return Container(
+      margin: const EdgeInsets.fromLTRB(5, 10, 13, 10),
+      child: Stack(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(radius),
+            child: IntrinsicWidth(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _oneSelectTranslateType(SubtitleOneType.text),
+                  _oneSelectTranslateType(SubtitleOneType.talk),
+                  _oneSelectTranslateType(SubtitleOneType.narration),
+                ],
+              ),
+            ),
+          ),
+          Positioned.fill(
+              child: IgnorePointer(
+            ignoring: true,
+            child: Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(radius),
+                  border: Border.all(width: 1, color: Colors.white)),
+            ),
+          ))
+        ],
+      ),
+    );
+  }
+
+  Widget _oneSelectTranslateType(
+      SubtitleOneType type) {
+    var thisOne = widget.oneTranslate.subtitleOneType == type;
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () {
+        ref
+            .read(translatorProvider.notifier)
+            .setOneTranslateType(widget.oneTranslate, type: type);
+      },
+      child: Container(
+        color: thisOne ? Colors.green : null,
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+        child: Text(
+          type.name,
+          style: const TextStyle(color: Colors.white, fontSize: 15),
+        ),
+      ),
     );
   }
 }

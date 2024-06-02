@@ -1,0 +1,4 @@
+enum VideoInputType{
+  file,
+  videoId
+}

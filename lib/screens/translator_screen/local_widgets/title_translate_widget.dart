@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-import 'package:youtube_translation/screens/translator_screen/local_utils/translator_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_translation/screens/translator_screen/translator_provider/translator_provider.dart';
 
-class TitleTranslateWidget extends StatefulWidget {
+class TitleTranslateWidget extends ConsumerStatefulWidget {
   const TitleTranslateWidget({Key? key}) : super(key: key);
 
   @override
-  State<TitleTranslateWidget> createState() => _TitleTranslateWidgetState();
+  ConsumerState<TitleTranslateWidget> createState() =>
+      _TitleTranslateWidgetState();
 }
 
-class _TitleTranslateWidgetState extends State<TitleTranslateWidget> {
+class _TitleTranslateWidgetState extends ConsumerState<TitleTranslateWidget> {
   final textEditingController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
-    var tp = context.watch<TranslatorProvider>();
+    var ts = ref.watch(translatorProvider);
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
@@ -27,7 +29,7 @@ class _TitleTranslateWidgetState extends State<TitleTranslateWidget> {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              if (tp.translatingTitle)
+              if (ts.translatorLoadingState.translatingTitle)
                 const SizedBox(
                     width: 10,
                     height: 10,
@@ -73,8 +75,9 @@ class _TitleTranslateWidgetState extends State<TitleTranslateWidget> {
                       ),
                       GestureDetector(
                         behavior: HitTestBehavior.translucent,
-                        onTap: () async{
-                          await Clipboard.setData(ClipboardData(text: textEditingController.text));
+                        onTap: () async {
+                          await Clipboard.setData(
+                              ClipboardData(text: textEditingController.text));
                         },
                         child: const Icon(
                           Icons.copy,
@@ -85,8 +88,9 @@ class _TitleTranslateWidgetState extends State<TitleTranslateWidget> {
                       const SizedBox(width: 10),
                       GestureDetector(
                         behavior: HitTestBehavior.translucent,
-                        onTap: (){
-                          tp.translateTitle(textEditingController.text);
+                        onTap: () {
+                          var t = ref.read(translatorProvider.notifier);
+                          t.translateTitle(textEditingController.text);
                         },
                         child: const Padding(
                           padding: EdgeInsets.only(right: 4),
@@ -105,8 +109,8 @@ class _TitleTranslateWidgetState extends State<TitleTranslateWidget> {
   }
 
   Widget _translated(BuildContext context) {
-    var tp = context.watch<TranslatorProvider>();
-    if (tp.translatedTitle != null) {
+    var ts = ref.read(translatorProvider);
+    if (ts.translatorDataState.translatedTitle != null) {
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -124,14 +128,15 @@ class _TitleTranslateWidgetState extends State<TitleTranslateWidget> {
               children: [
                 Expanded(
                     child: Text(
-                      tp.translatedTitle!,
-                  style:
-                      const TextStyle(color: Colors.white, fontSize: 16, height: 1.3),
+                  ts.translatorDataState.translatedTitleText!,
+                  style: const TextStyle(
+                      color: Colors.white, fontSize: 16, height: 1.3),
                 )),
                 GestureDetector(
                   behavior: HitTestBehavior.translucent,
-                  onTap: () async{
-                    await Clipboard.setData(ClipboardData(text: tp.translatedTitle!));
+                  onTap: () async {
+                    await Clipboard.setData(ClipboardData(
+                        text: ts.translatorDataState.translatedTitleText!));
                   },
                   child: const Icon(
                     Icons.copy,

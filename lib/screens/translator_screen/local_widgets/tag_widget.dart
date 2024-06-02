@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-import 'package:youtube_translation/screens/translator_screen/local_utils/translator_provider.dart';
-import 'package:youtube_translation/services/user_https.dart';
-import 'package:youtube_translation/utils/key_storage.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_translation/screens/translator_screen/translator_provider/translator_provider.dart';
 
-class TagWidget extends StatefulWidget {
+class TagWidget extends ConsumerStatefulWidget {
   const TagWidget({Key? key}) : super(key: key);
 
   @override
-  State<TagWidget> createState() => _TagWidgetState();
+  ConsumerState<TagWidget> createState() => _TagWidgetState();
 }
 
-class _TagWidgetState extends State<TagWidget> {
+class _TagWidgetState extends ConsumerState<TagWidget> {
   late final TextEditingController tec;
   final tagFocus = FocusNode();
   bool _textChanged = false;
@@ -26,7 +24,7 @@ class _TagWidgetState extends State<TagWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var tp = context.watch<TranslatorProvider>();
+    var ts = ref.watch(translatorProvider);
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
@@ -62,10 +60,12 @@ class _TagWidgetState extends State<TagWidget> {
                 onKey: (keyEvent) {
                   if (keyEvent.logicalKey == LogicalKeyboardKey.backspace) {
                     if (!_textChanged &&
-                        tp.tags.isNotEmpty &&
+                        ts.translatorDataState.tags.isNotEmpty &&
                         tec.text.isEmpty) {
                       setState(() {
-                        tec.text = tp.tags.removeLast();
+                        var t = ref.read(translatorProvider.notifier);
+                        tec.text =
+                            t.removeTag(ts.translatorDataState.tags.last);
                       });
                       FocusScope.of(context).requestFocus(tagFocus);
                       tec.selection = TextSelection.fromPosition(
@@ -78,7 +78,9 @@ class _TagWidgetState extends State<TagWidget> {
                 },
                 child: SingleChildScrollView(
                   child: Wrap(
-                      children: tp.tags.map((e) => tagWidget(e)).toList() +
+                      children: ts.translatorDataState.tags
+                              .map((e) => tagWidget(e))
+                              .toList() +
                           [writingArea]),
                 )),
           ),
@@ -89,7 +91,7 @@ class _TagWidgetState extends State<TagWidget> {
 
 //
   Widget tagWidget(String tag) {
-    var tp = context.watch<TranslatorProvider>();
+    var ts = ref.watch(translatorProvider);
     return Container(
       margin: const EdgeInsets.all(5),
       decoration: BoxDecoration(
@@ -102,7 +104,8 @@ class _TagWidgetState extends State<TagWidget> {
           GestureDetector(
             behavior: HitTestBehavior.translucent,
             onTap: () {
-              tp.removeTag(tag);
+              var t = ref.read(translatorProvider.notifier);
+              t.removeTag(tag);
               FocusScope.of(context).requestFocus(tagFocus);
             },
             child: Padding(
@@ -149,15 +152,16 @@ class _TagWidgetState extends State<TagWidget> {
   }
 
   void createOne() {
-    var tp = context.read<TranslatorProvider>();
+    var ts = ref.watch(translatorProvider);
     var str = tec.text.trim();
     if (str == ',') {
       tec.text = '';
     } else if (str.isNotEmpty) {
       var tags = str.split(',');
-      for(var tag in tags){
-        if (!tp.tags.contains(tag.trim())) {
-          tp.addTag(tag.trim());
+      for (var tag in tags) {
+        if (!ts.translatorDataState.tags.contains(tag.trim())) {
+          var t = ref.read(translatorProvider.notifier);
+          t.addTag(tag.trim());
         }
       }
       tec.text = '';
