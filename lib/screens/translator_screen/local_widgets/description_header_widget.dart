@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_translation/provider/screen_provider/screen_provider.dart';
 import 'package:youtube_translation/screens/translator_screen/translator_provider/translator_provider.dart';
 
 class DescriptionHeaderWidget extends ConsumerStatefulWidget {

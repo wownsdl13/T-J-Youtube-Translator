@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_translation/provider/initialize_provider/initialize_provider.dart';
 import 'package:youtube_translation/screen.dart';
-import 'package:youtube_translation/screens/translator_screen/translator_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {

@@ -172,15 +172,17 @@ class Translator extends _$Translator with TranslatorDataMixin {
         if (videoId != null && videoId.isNotEmpty) {
           oAuthToken = await ss.googleAccessToken;
           if (oAuthToken != null) {
-            state = state.copyWith(
-                uploadPercentage: state.uploadPercentage!
-                    .copyWith(text: 'uploading localizations'));
-            await ref
-                .read(youtubeRepositoryProvider.notifier)
-                .setVideoLocalizations(
-                    oAuthToken: oAuthToken,
-                    videoId: videoId,
-                    localizations: localizations);
+            if (state.translatorDataState.title.trim().isNotEmpty) {
+              state = state.copyWith(
+                  uploadPercentage: state.uploadPercentage!
+                      .copyWith(text: 'uploading localizations'));
+              await ref
+                  .read(youtubeRepositoryProvider.notifier)
+                  .setVideoLocalizations(
+                      oAuthToken: oAuthToken,
+                      videoId: videoId,
+                      localizations: localizations);
+            }
             state = state.copyWith(
                 uploadPercentage: state.uploadPercentage!
                     .copyWith(text: 'uploading thumbnail'));
@@ -195,16 +197,26 @@ class Translator extends _$Translator with TranslatorDataMixin {
             if (state.translatorDataState.translateList.isNotEmpty) {
               state = state.copyWith(
                   uploadPercentage: state.uploadPercentage!
-                      .copyWith(text: 'uploading captions'));
+                      .copyWith(text: 'uploading captions', percentage: 0));
+              var count = 0;
               for (var lang in Languages.langList) {
-                var srt = _generateSrt(lang);
-                await ref
-                    .read(youtubeRepositoryProvider.notifier)
-                    .uploadCaption(
-                        oAuthToken: oAuthToken,
-                        videoId: videoId,
-                        language: lang,
-                        srt: srt);
+                count++;
+                try {
+                  var srt = _generateSrt(lang);
+                  await ref
+                      .read(youtubeRepositoryProvider.notifier)
+                      .uploadCaption(
+                          oAuthToken: oAuthToken,
+                          videoId: videoId,
+                          language: lang,
+                          srt: srt);
+                  state = state.copyWith(
+                      uploadPercentage: state.uploadPercentage!.copyWith(
+                          percentage:
+                              (count / Languages.langList.length).floor()));
+                } catch (e) {
+                  print('cannot upload $lang caption');
+                }
               }
             }
             var comment = state.translatorDataState.comment.trim();
@@ -225,6 +237,9 @@ class Translator extends _$Translator with TranslatorDataMixin {
 
   Future<Map<String, Map<String, String>>> get _localizations async {
     var localizations = <String, Map<String, String>>{};
+    if (state.translatorDataState.title.trim().isEmpty) {
+      return {};
+    }
     String titleHeader =
         (await state.translatorDataState.getTitleHeader).trim();
     if (titleHeader.isNotEmpty) {

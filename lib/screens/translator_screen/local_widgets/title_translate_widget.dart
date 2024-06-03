@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_translation/provider/screen_provider/screen_provider.dart';
 import 'package:youtube_translation/screens/translator_screen/translator_provider/translator_provider.dart';
 
 class TitleTranslateWidget extends ConsumerStatefulWidget {
@@ -50,6 +51,9 @@ class _TitleTranslateWidgetState extends ConsumerState<TitleTranslateWidget> {
           width: 10,
         ),
         Container(
+            key: ValueKey('${ref.read(translatorProvider).translatorDataState.title}-${ref
+                .watch(
+                screenProvider.select((value) => value.languageCode))}'),
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(width: 1, color: Colors.white)),
@@ -128,7 +132,7 @@ class _TitleTranslateWidgetState extends ConsumerState<TitleTranslateWidget> {
               children: [
                 Expanded(
                     child: Text(
-                  ts.translatorDataState.translatedTitleText!,
+                  ts.translatorDataState.translatedTitleText ?? '',
                   style: const TextStyle(
                       color: Colors.white, fontSize: 16, height: 1.3),
                 )),

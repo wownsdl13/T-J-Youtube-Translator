@@ -90,7 +90,7 @@ mixin TranslatorDataMixin<T extends TranslatorState> {
 
   void setLang(OneTranslate model,
       {required String languageCode, required String text}) {
-    if(!state.translatorDataState.hasLang(languageCode)){
+    if (!state.translatorDataState.hasLang(languageCode)) {
       return;
     }
     var newTranslations = Map<String, String>.from(model.translations);
@@ -147,16 +147,27 @@ mixin TranslatorDataMixin<T extends TranslatorState> {
         state.translatorDataState.title != controllerText) {
       state = state.copyWith(
           translatorDataState:
-              state.translatorDataState.copyWith(title: controllerText),
+              state.translatorDataState.copyWith(title: controllerText, translatedTitle: {
+                Languages.ko:controllerText
+              }),
           translatorLoadingState:
               state.translatorLoadingState.copyWith(translatingTitle: true));
-      var translatedTitle = await ref
-          .read(translateRepositoryProvider.notifier)
-          .translateToLanguages(controllerText, Languages.langList,
-              openAiApiKey: openAiApiKey);
+      for (var lang in Languages.langList) {
+        var old = Map<String, String>.from(state.translatorDataState.translatedTitle!);
+        if(old.containsKey(lang)){
+          continue;
+        }
+        var translatedTitle = await ref
+            .read(translateRepositoryProvider.notifier)
+            .translateToLanguages(controllerText, lang,
+                openAiApiKey: openAiApiKey);
+        old[lang] = translatedTitle;
+        state = state.copyWith(
+            translatorDataState:
+                state.translatorDataState.copyWith(translatedTitle: old));
+        print('T lang > $lang');
+      }
       state = state.copyWith(
-          translatorDataState: state.translatorDataState
-              .copyWith(translatedTitle: translatedTitle),
           translatorLoadingState:
               state.translatorLoadingState.copyWith(translatingTitle: false));
     }
@@ -168,16 +179,27 @@ mixin TranslatorDataMixin<T extends TranslatorState> {
         state.translatorDataState.description != controllerText) {
       state = state.copyWith(
           translatorDataState:
-              state.translatorDataState.copyWith(description: controllerText),
+              state.translatorDataState.copyWith(description: controllerText, translatedDescription: {
+                Languages.ko:controllerText
+              }),
           translatorLoadingState: state.translatorLoadingState
               .copyWith(translatingDescription: true));
-      var translatedDescription = await ref
-          .read(translateRepositoryProvider.notifier)
-          .translateToLanguages(controllerText, Languages.langList,
-              openAiApiKey: openAiApiKey);
+      for (var lang in Languages.langList) {
+        var old = Map<String, String>.from(state.translatorDataState.translatedDescription!);
+        if(old.containsKey(lang)){
+          continue;
+        }
+        var translatedTitle = await ref
+            .read(translateRepositoryProvider.notifier)
+            .translateToLanguages(controllerText, lang,
+                openAiApiKey: openAiApiKey);
+        old[lang] = translatedTitle;
+        state = state.copyWith(
+            translatorDataState:
+                state.translatorDataState.copyWith(translatedDescription: old));
+        print('D lang > $lang');
+      }
       state = state.copyWith(
-          translatorDataState: state.translatorDataState
-              .copyWith(translatedDescription: translatedDescription),
           translatorLoadingState: state.translatorLoadingState
               .copyWith(translatingDescription: false));
     }

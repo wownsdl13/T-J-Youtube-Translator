@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_translation/provider/screen_provider/screen_provider.dart';
 import 'package:youtube_translation/screens/translator_screen/translator_provider/translator_provider.dart';
 
 class DescriptionTranslateWidget extends ConsumerStatefulWidget {
@@ -49,6 +50,9 @@ class _DescriptionTranslateWidgetState
         ),
         const SizedBox(width: 10),
         Container(
+            key: ValueKey('${ref.read(translatorProvider).translatorDataState.description}-${ref
+                .watch(
+                screenProvider.select((value) => value.languageCode))}'),
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(width: 1, color: Colors.white)),
@@ -136,7 +140,7 @@ class _DescriptionTranslateWidgetState
                     onTap: () async {
                       await Clipboard.setData(ClipboardData(
                           text: ts
-                              .translatorDataState.translatedDescriptionText!));
+                              .translatorDataState.translatedDescriptionText ?? ''));
                     },
                     child: const Icon(
                       Icons.copy,

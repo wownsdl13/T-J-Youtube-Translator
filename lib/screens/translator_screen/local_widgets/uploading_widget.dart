@@ -8,20 +8,24 @@ class UploadingWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var ts = ref.watch(translatorProvider);
-    if(ts.isUploading) {
+    if (ts.isUploading) {
       return Container(
+        key: ValueKey(ts.uploadPercentage),
         color: Colors.black.withOpacity(.7),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('${ts.uploadPercentage}%', style: const TextStyle(color: Colors.white, fontSize: 70)),
-              Text(ts.uploadText, style: const TextStyle(color: Colors.white, fontSize: 21)),
+              if (ts.uploadPercentage?.percentage != null)
+                Text('${ts.uploadPercentage?.percentage}%',
+                    style: const TextStyle(color: Colors.white, fontSize: 50)),
+              Text(ts.uploadText,
+                  style: const TextStyle(color: Colors.white, fontSize: 21)),
             ],
           ),
         ),
       );
-    }else{
+    } else {
       return Container();
     }
   }

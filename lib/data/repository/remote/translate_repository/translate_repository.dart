@@ -21,19 +21,10 @@ class TranslateRepository extends _$TranslateRepository {
     return const TranslateRepositoryState();
   }
 
-  Future<Map<String, String>> translateToLanguages(
-      String text, List<String> targetLanguages,
+  Future<String> translateToLanguages(
+      String text, String targetLanguageCode,
       {required String openAiApiKey}) async {
     final dio = Dio();
-
-    if (RegExp(r'^[!.? ]*$').hasMatch(text)) {
-      return targetLanguages.fold<Map<String, String>>({},
-          (previousValue, lang) {
-        previousValue[lang] = text;
-        return previousValue;
-      });
-    }
-
     while (true) {
       try {
         var result = await dio
@@ -46,15 +37,15 @@ class TranslateRepository extends _$TranslateRepository {
                 },
               ),
               data: jsonEncode({
-                'model': 'gpt-4-turbo',
+                'model': 'gpt-4o',
                 'messages': [
                   {
                     'role': 'user',
                     'content': """{
-"Translate the following text": "$text",
-"Target languages": [${targetLanguages.map((e) => '"$e"').toList().join(', ')}]
-"Format": “json: { "languageCode1":..., "languageCode2":..., "languageCode3":..., "languageCode4":..., "languageCode5":... }”
-"Conditions": ["Keep it friendly, considering it's for a YouTube subtitles", "If the sentence is incorrect, please correct it", "Keep original if language is same with original", "it's really important. you must fill in everything. don't miss it"]
+"Translate this text": {"text":"$text"},
+"Target language": $targetLanguageCode,
+"Format": “json: {"text":"translatedText"}”
+"Conditions": ["Keep it friendly, considering it's for a YouTube title, description", "Don't forget to use proper spacing", "If the sentence is incorrect, please correct it", "Keep original if language is same with original", "it's really important. you must fill in everything. don't miss it"]
 }
                 """,
                   }
@@ -65,13 +56,11 @@ class TranslateRepository extends _$TranslateRepository {
               }),
             )
             .timeout(const Duration(seconds: 620));
-
-        await Future.delayed(const Duration(seconds: 5));
         if (result.statusCode == 200) {
           var gpt = GptResponse.fromJson(result.data);
           var map = (jsonDecode(gpt.text) as Map)
               .map((key, value) => MapEntry(key.toString(), value.toString()));
-          return map;
+          return map['text']!;
         } else {
           print('Response not 200: ${result.data}');
         }
@@ -79,21 +68,6 @@ class TranslateRepository extends _$TranslateRepository {
         print('Error: $e');
       }
     }
-  }
-
-  Future<void> translateTxtList(
-      List<OneTranslate> translateList, TranslateCallback callback,
-      {required List<String> langList,
-      required String openAiApiKey,
-      bool useEnglish = false}) async {
-    await _processList(
-      translateList,
-      (item) => item.getLang(useEnglish ? Languages.en : Languages.original),
-      (item, translatedText) => callback(item, translatedText),
-      (text, {required String openAiApiKey}) =>
-          translateToLanguages(text, langList, openAiApiKey: openAiApiKey),
-      openAiApiKey: openAiApiKey,
-    );
   }
 
   Future<List<OneTranslate>> translateToTargetLang(
