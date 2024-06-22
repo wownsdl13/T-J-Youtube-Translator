@@ -46,6 +46,25 @@ class Languages{
   static List<String> get blogLangList =>
       [ko, en, zh, es, id, pt, ru, ja, de, fr, it, tr, vi, th, pl, nl, hi, hu];
 
+  static List<String> get captionsLangList => [
+    ko, // 한국어
+    en, // 영어
+    ja, // 일본어
+    fr, // 프랑스어
+    zh, // 중국어
+    es, // 스페인어
+    vi, // 베트남어
+    ar, // 아랍어
+    nl, // 네덜란드어
+    it, // 이탈리아어
+    de, // 독일어
+    ru, // 러시아어
+    pt, // 포르투갈어
+    tr, // 터키어
+    hi, // 힌디어
+    th, // 태국어
+    id  // 인도네시아어
+  ];
   //id, th, hi
 
   static List<String> get langList => [
@@ -183,5 +202,99 @@ class Languages{
         return 'Filipino';
     }
     return '';
+  }
+
+  static String getSubtitleSupportMessage(String languageCode) {
+    if(!captionsLangList.contains(languageCode)){
+      return '';
+    }
+    switch (languageCode) {
+      case Languages.ko:
+        return '이 영상은 한국어 자막을 지원합니다';
+      case Languages.en:
+        return 'This video supports English subtitles';
+      case Languages.ja:
+        return 'この動画には日本語の字幕があります';
+      case Languages.fr:
+        return 'Cette vidéo propose des sous-titres en français';
+      case Languages.zh:
+        return '本视频提供中文字幕';
+      case Languages.es:
+        return 'Este video tiene subtítulos en español';
+      case Languages.vi:
+        return 'Video này có phụ đề tiếng Việt';
+      case Languages.ar:
+        return 'هذا الفيديو يدعم الترجمة العربية';
+      case Languages.nl:
+        return 'Deze video heeft Nederlandse ondertitels';
+      case Languages.de:
+        return 'Dieses Video unterstützt deutsche Untertitel';
+      case Languages.ms:
+        return 'Video ini menyokong sari kata dalam Bahasa Melayu';
+      case Languages.ru:
+        return 'Это видео поддерживает русские субтитры';
+      case Languages.uk:
+        return 'Це відео має українські субтитри';
+      case Languages.it:
+        return 'Questo video ha sottotitoli in italiano';
+      case Languages.pt:
+        return 'Este vídeo tem legendas em português';
+      case Languages.tr:
+        return 'Bu video Türkçe altyazı destekliyor';
+      case Languages.hu:
+        return 'Ez a videó magyar feliratot tartalmaz';
+      case Languages.el:
+        return 'Αυτό το βίντεο διαθέτει ελληνικούς υπότιτλους';
+      case Languages.sv:
+        return 'Denna video har svenska undertexter';
+      case Languages.no:
+        return 'Denne videoen har norske undertekster';
+      case Languages.fi:
+        return 'Tässä videossa on suomenkielinen tekstitys';
+      case Languages.be:
+        return 'Гэта відэа мае беларускія субтытры';
+      case Languages.ro:
+        return 'Acest videoclip are subtitrări în limba română';
+      case Languages.bg:
+        return 'Това видео има български субтитри';
+      case Languages.sr:
+        return 'Ovaj video ima srpske titlove';
+      case Languages.uz:
+        return 'Ushbu video oʻzbekcha subtitrlarni oʻz ichiga oladi';
+      case Languages.kk:
+        return 'Бұл бейнеде қазақша субтитрлер бар';
+      case Languages.sq:
+        return 'Ky video ka përkthime në shqip';
+      case Languages.cs:
+        return 'Toto video má české titulky';
+      case Languages.pl:
+        return 'Ten film ma polskie napisy';
+      case Languages.hr:
+        return 'Ovaj video ima hrvatske titlove';
+      case Languages.sk:
+        return 'Toto video má slovenské titulky';
+      case Languages.lt:
+        return 'Šis vaizdo įrašas turi lietuviškus subtitrus';
+      case Languages.lv:
+        return 'Šim videoklipam ir latviešu subtitri';
+      case Languages.et:
+        return 'Sellel videol on eesti subtiitrid';
+      case Languages.sl:
+        return 'Ta video ima slovenske podnapise';
+      case Languages.az:
+        return 'Bu videoda Azərbaycan dilində subtitrlər var';
+      case Languages.ka:
+        return 'ამ ვიდეოს აქვს ქართული სუბტიტრები';
+      case Languages.id:
+        return 'Video ini memiliki subtitle Bahasa Indonesia';
+      case Languages.th:
+        return 'วิดีโอนี้มีคำบรรยายภาษาไทย';
+      case Languages.hi:
+        return 'इस वीडियो में हिंदी उपशीर्षक उपलब्ध हैं';
+      case Languages.tl:
+        return 'Ang video na ito ay may mga subtitle sa Filipino';
+      default:
+        return 'This video supports subtitles in multiple languages';
+    }
   }
 }

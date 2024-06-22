@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-class ShareScreen extends ConsumerWidget {
-  const ShareScreen({super.key});
+class UtilScreen extends ConsumerWidget {
+  const UtilScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

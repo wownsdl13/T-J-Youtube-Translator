@@ -6,7 +6,7 @@ part of 'initialize_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$initializeHash() => r'c4a8afea46b8c0ded61920ebc390a94495eb39a2';
+String _$initializeHash() => r'63e6bae992979a9ecdc0b54158dbfad7d2b96566';
 
 /// See also [initialize].
 @ProviderFor(initialize)

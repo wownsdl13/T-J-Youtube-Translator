@@ -22,7 +22,7 @@ class ChangeLang extends ConsumerWidget {
       child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: Languages.langList
+          children: Languages.captionsLangList
               .map((e) => GestureDetector(
                     behavior: HitTestBehavior.translucent,
                     onTap: () {

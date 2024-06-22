@@ -165,7 +165,6 @@ mixin TranslatorDataMixin<T extends TranslatorState> {
         state = state.copyWith(
             translatorDataState:
                 state.translatorDataState.copyWith(translatedTitle: old));
-        print('T lang > $lang');
       }
       state = state.copyWith(
           translatorLoadingState:
@@ -197,7 +196,6 @@ mixin TranslatorDataMixin<T extends TranslatorState> {
         state = state.copyWith(
             translatorDataState:
                 state.translatorDataState.copyWith(translatedDescription: old));
-        print('D lang > $lang');
       }
       state = state.copyWith(
           translatorLoadingState: state.translatorLoadingState
@@ -248,7 +246,7 @@ mixin TranslatorDataMixin<T extends TranslatorState> {
       if (list.isEmpty) {
         return;
       }
-      var langList = Languages.langList;
+      var langList = Languages.captionsLangList;
       var doneCount = 0;
       for (var lang in langList) {
         doneCount++;

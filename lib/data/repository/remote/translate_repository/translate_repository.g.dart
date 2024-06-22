@@ -7,7 +7,7 @@ part of 'translate_repository.dart';
 // **************************************************************************
 
 String _$translateRepositoryHash() =>
-    r'31a30239fbe4eb26330795c4f437e78ec0c11ebf';
+    r'd0a09ff9a8c5a25e0bc887abf97070fd7e545412';
 
 /// See also [TranslateRepository].
 @ProviderFor(TranslateRepository)

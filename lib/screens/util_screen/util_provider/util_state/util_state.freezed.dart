@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'share_state.dart';
+part of 'util_state.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -15,19 +15,18 @@ final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
-mixin _$ShareState {}
+mixin _$UtilState {}
 
 /// @nodoc
-abstract class $ShareStateCopyWith<$Res> {
-  factory $ShareStateCopyWith(
-          ShareState value, $Res Function(ShareState) then) =
-      _$ShareStateCopyWithImpl<$Res, ShareState>;
+abstract class $UtilStateCopyWith<$Res> {
+  factory $UtilStateCopyWith(UtilState value, $Res Function(UtilState) then) =
+      _$UtilStateCopyWithImpl<$Res, UtilState>;
 }
 
 /// @nodoc
-class _$ShareStateCopyWithImpl<$Res, $Val extends ShareState>
-    implements $ShareStateCopyWith<$Res> {
-  _$ShareStateCopyWithImpl(this._value, this._then);
+class _$UtilStateCopyWithImpl<$Res, $Val extends UtilState>
+    implements $UtilStateCopyWith<$Res> {
+  _$UtilStateCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
@@ -36,41 +35,41 @@ class _$ShareStateCopyWithImpl<$Res, $Val extends ShareState>
 }
 
 /// @nodoc
-abstract class _$$ShareStateImplCopyWith<$Res> {
-  factory _$$ShareStateImplCopyWith(
-          _$ShareStateImpl value, $Res Function(_$ShareStateImpl) then) =
-      __$$ShareStateImplCopyWithImpl<$Res>;
+abstract class _$$UtilStateImplCopyWith<$Res> {
+  factory _$$UtilStateImplCopyWith(
+          _$UtilStateImpl value, $Res Function(_$UtilStateImpl) then) =
+      __$$UtilStateImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$ShareStateImplCopyWithImpl<$Res>
-    extends _$ShareStateCopyWithImpl<$Res, _$ShareStateImpl>
-    implements _$$ShareStateImplCopyWith<$Res> {
-  __$$ShareStateImplCopyWithImpl(
-      _$ShareStateImpl _value, $Res Function(_$ShareStateImpl) _then)
+class __$$UtilStateImplCopyWithImpl<$Res>
+    extends _$UtilStateCopyWithImpl<$Res, _$UtilStateImpl>
+    implements _$$UtilStateImplCopyWith<$Res> {
+  __$$UtilStateImplCopyWithImpl(
+      _$UtilStateImpl _value, $Res Function(_$UtilStateImpl) _then)
       : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$ShareStateImpl implements _ShareState {
-  const _$ShareStateImpl();
+class _$UtilStateImpl implements _UtilState {
+  const _$UtilStateImpl();
 
   @override
   String toString() {
-    return 'ShareState()';
+    return 'UtilState()';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$ShareStateImpl);
+        (other.runtimeType == runtimeType && other is _$UtilStateImpl);
   }
 
   @override
   int get hashCode => runtimeType.hashCode;
 }
 
-abstract class _ShareState implements ShareState {
-  const factory _ShareState() = _$ShareStateImpl;
+abstract class _UtilState implements UtilState {
+  const factory _UtilState() = _$UtilStateImpl;
 }

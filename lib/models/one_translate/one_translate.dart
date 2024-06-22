@@ -20,6 +20,9 @@ class OneTranslate with _$OneTranslate {
       return '';
     }
     var text = translations[languageCode]!;
+    if(!addQuotesAndBracket){
+      return text;
+    }
     switch (subtitleOneType) {
       case SubtitleOneType.narration:
         return text;

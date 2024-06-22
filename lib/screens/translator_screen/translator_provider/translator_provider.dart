@@ -199,7 +199,7 @@ class Translator extends _$Translator with TranslatorDataMixin {
                   uploadPercentage: state.uploadPercentage!
                       .copyWith(text: 'uploading captions', percentage: 0));
               var count = 0;
-              for (var lang in Languages.langList) {
+              for (var lang in Languages.captionsLangList) {
                 count++;
                 try {
                   var srt = _generateSrt(lang);
@@ -213,7 +213,7 @@ class Translator extends _$Translator with TranslatorDataMixin {
                   state = state.copyWith(
                       uploadPercentage: state.uploadPercentage!.copyWith(
                           percentage:
-                              (count / Languages.langList.length).floor()));
+                              (count / Languages.captionsLangList.length).floor()));
                 } catch (e) {
                   print('cannot upload $lang caption');
                 }
@@ -246,17 +246,22 @@ class Translator extends _$Translator with TranslatorDataMixin {
       titleHeader += ' ';
     }
 
+
     String descriptionHeader =
         (await state.translatorDataState.getDescriptionHeader).trim();
     if (descriptionHeader.isNotEmpty) {
       descriptionHeader += '\n\n';
     }
     for (var lang in Languages.langList) {
+      String subtitleSupport = Languages.getSubtitleSupportMessage(lang);
+      if(subtitleSupport.isNotEmpty){
+        subtitleSupport += '\n\n\n';
+      }
       String blogPostLink = _translateBlogPostLink(lang);
       localizations[lang] = {
         'title':
             '$titleHeader${state.translatorDataState.translatedTitle![lang]!}',
-        'description': blogPostLink +
+        'description': subtitleSupport + blogPostLink +
             descriptionHeader +
             state.translatorDataState.translatedDescription![lang]!,
       };
