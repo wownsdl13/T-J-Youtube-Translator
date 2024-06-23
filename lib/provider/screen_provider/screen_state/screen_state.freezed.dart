@@ -149,7 +149,7 @@ class __$$ScreenStateImplCopyWithImpl<$Res>
 
 class _$ScreenStateImpl extends _ScreenState {
   const _$ScreenStateImpl(
-      {this.screenType = ScreenType.share,
+      {this.screenType = ScreenType.translator,
       this.googleId,
       required this.userRepositoryState,
       required this.languageCode})

@@ -1,20 +1,14 @@
-import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/services.dart';
 import 'package:retrofit/retrofit.dart';
 
 part 'open_ai_client.g.dart';
 
-@RestApi(baseUrl: 'api.openai.com/v1/')
+@RestApi(baseUrl: OpenAiClient.baseUrl)
 abstract class OpenAiClient {
   factory OpenAiClient(Dio dio, {String baseUrl}) = _OpenAiClient;
-
-  @POST('audio/transcriptions')
-  @MultiPart()
-  Future<HttpResponse> transcribeAudio(
-    @Header('Authorization') String authorization,
-    @Part(name: 'file') File file,
-  );
+  static const baseUrl = 'https://api.openai.com/v1/';
 
   @POST('completions')
   Future<HttpResponse> translateText(

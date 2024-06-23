@@ -8,7 +8,7 @@ part 'screen_state.freezed.dart';
 @Freezed()
 class ScreenState with _$ScreenState {
   const factory ScreenState({
-    @Default(ScreenType.share) ScreenType screenType,
+    @Default(ScreenType.translator) ScreenType screenType,
     GoogleSignInAccount? googleId,
     required UserRepositoryState userRepositoryState,
     required String languageCode,

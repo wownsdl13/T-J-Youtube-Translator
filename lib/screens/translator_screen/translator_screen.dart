@@ -76,7 +76,7 @@ class _TranslatorScreenState extends ConsumerState<TranslatorScreen> {
                               key: langKey,
                               padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
                               decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(30),
+                                  borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
                                       width: 1, color: Colors.white)),
                               child: Text(

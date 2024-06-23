@@ -3,8 +3,8 @@ import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+import 'package:youtube_translation/data/repository/remote/open_ai_repository/open_ai_repository.dart';
 import 'package:youtube_translation/data/repository/remote/subtitle_repository/subtitle_repository.dart';
-import 'package:youtube_translation/data/repository/remote/translate_repository/translate_repository.dart';
 import 'package:youtube_translation/data/repository/remote/user_repository/user_repository.dart';
 import 'package:youtube_translation/models/one_translate/enum/subtitle_one_type.dart';
 import 'package:youtube_translation/models/one_translate/one_translate.dart';
@@ -146,19 +146,19 @@ mixin TranslatorDataMixin<T extends TranslatorState> {
     if (!state.translatorLoadingState.translatingTitle &&
         state.translatorDataState.title != controllerText) {
       state = state.copyWith(
-          translatorDataState:
-              state.translatorDataState.copyWith(title: controllerText, translatedTitle: {
-                Languages.ko:controllerText
-              }),
+          translatorDataState: state.translatorDataState.copyWith(
+              title: controllerText,
+              translatedTitle: {Languages.ko: controllerText}),
           translatorLoadingState:
               state.translatorLoadingState.copyWith(translatingTitle: true));
       for (var lang in Languages.langList) {
-        var old = Map<String, String>.from(state.translatorDataState.translatedTitle!);
-        if(old.containsKey(lang)){
+        var old = Map<String, String>.from(
+            state.translatorDataState.translatedTitle!);
+        if (old.containsKey(lang)) {
           continue;
         }
         var translatedTitle = await ref
-            .read(translateRepositoryProvider.notifier)
+            .read(openAiRepositoryProvider)
             .translateToLanguages(controllerText, lang,
                 openAiApiKey: openAiApiKey);
         old[lang] = translatedTitle;
@@ -177,19 +177,19 @@ mixin TranslatorDataMixin<T extends TranslatorState> {
     if (!state.translatorLoadingState.translatingDescription &&
         state.translatorDataState.description != controllerText) {
       state = state.copyWith(
-          translatorDataState:
-              state.translatorDataState.copyWith(description: controllerText, translatedDescription: {
-                Languages.ko:controllerText
-              }),
+          translatorDataState: state.translatorDataState.copyWith(
+              description: controllerText,
+              translatedDescription: {Languages.ko: controllerText}),
           translatorLoadingState: state.translatorLoadingState
               .copyWith(translatingDescription: true));
       for (var lang in Languages.langList) {
-        var old = Map<String, String>.from(state.translatorDataState.translatedDescription!);
-        if(old.containsKey(lang)){
+        var old = Map<String, String>.from(
+            state.translatorDataState.translatedDescription!);
+        if (old.containsKey(lang)) {
           continue;
         }
         var translatedTitle = await ref
-            .read(translateRepositoryProvider.notifier)
+            .read(openAiRepositoryProvider)
             .translateToLanguages(controllerText, lang,
                 openAiApiKey: openAiApiKey);
         old[lang] = translatedTitle;
@@ -216,7 +216,7 @@ mixin TranslatorDataMixin<T extends TranslatorState> {
         return;
       }
       var englishTranslates = await ref
-          .read(translateRepositoryProvider.notifier)
+          .read(openAiRepositoryProvider)
           .translateToTargetLang(list,
               openAiApiKey: openAiApiKey,
               fromLanguageCode: fromLanguageCode,
@@ -264,7 +264,7 @@ mixin TranslatorDataMixin<T extends TranslatorState> {
           fromLanguageCode = Languages.original;
         }
         var englishTranslates = await ref
-            .read(translateRepositoryProvider.notifier)
+            .read(openAiRepositoryProvider)
             .translateToTargetLang(list,
                 openAiApiKey: openAiApiKey,
                 fromLanguageCode: fromLanguageCode,

@@ -1,4 +1,5 @@
-import 'package:youtube_translation/data/repository/remote/translate_repository/chat_gpt/inner_dto/message.dart';
+
+import 'package:youtube_translation/data/repository/remote/open_ai_repository/chat_gpt/inner_dto/message.dart';
 
 class Choice {
   final int index;

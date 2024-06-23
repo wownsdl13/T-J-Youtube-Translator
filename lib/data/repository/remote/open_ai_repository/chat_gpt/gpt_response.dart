@@ -1,5 +1,6 @@
-import 'package:youtube_translation/data/repository/remote/translate_repository/chat_gpt/inner_dto/choice.dart';
-import 'package:youtube_translation/data/repository/remote/translate_repository/chat_gpt/inner_dto/usage.dart';
+
+import 'package:youtube_translation/data/repository/remote/open_ai_repository/chat_gpt/inner_dto/choice.dart';
+import 'package:youtube_translation/data/repository/remote/open_ai_repository/chat_gpt/inner_dto/usage.dart';
 
 class GptResponse {
 

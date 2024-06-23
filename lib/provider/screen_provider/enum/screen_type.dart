@@ -1,4 +1,4 @@
 enum ScreenType{
   translator,
-  share
+  util
 }

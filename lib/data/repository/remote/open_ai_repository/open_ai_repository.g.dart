@@ -1,27 +1,26 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'translate_repository.dart';
+part of 'open_ai_repository.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$translateRepositoryHash() =>
-    r'd0a09ff9a8c5a25e0bc887abf97070fd7e545412';
+String _$openAiRepositoryHash() => r'f7e4ef7a86de6e3162e0f4dd86ae94115ed0b841';
 
-/// See also [TranslateRepository].
-@ProviderFor(TranslateRepository)
-final translateRepositoryProvider = AutoDisposeNotifierProvider<
-    TranslateRepository, TranslateRepositoryState>.internal(
-  TranslateRepository.new,
-  name: r'translateRepositoryProvider',
+/// See also [OpenAiRepository].
+@ProviderFor(OpenAiRepository)
+final openAiRepositoryProvider = AutoDisposeNotifierProvider<OpenAiRepository,
+    OpenAiRepositoryState>.internal(
+  OpenAiRepository.new,
+  name: r'openAiRepositoryProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$translateRepositoryHash,
+      : _$openAiRepositoryHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$TranslateRepository = AutoDisposeNotifier<TranslateRepositoryState>;
+typedef _$OpenAiRepository = AutoDisposeNotifier<OpenAiRepositoryState>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

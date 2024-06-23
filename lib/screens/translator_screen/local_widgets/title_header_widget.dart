@@ -17,7 +17,6 @@ class _TitleHeaderWidgetState extends ConsumerState<TitleHeaderWidget> {
     // TODO: implement initState
     var t = ref.read(translatorProvider);
     t.translatorDataState.getTitleHeader.then((value) {
-      print('value > ${value}');
       setState(() {
         textEditingController.text = value;
       });
