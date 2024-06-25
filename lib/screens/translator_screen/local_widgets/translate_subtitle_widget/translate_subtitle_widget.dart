@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dropzone/flutter_dropzone.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_translation/data/client/remote/subtitle_client/enum/get_subtitle_direction.dart';
+import 'package:youtube_translation/models/one_translate/enum/subtitle_one_type.dart';
 import 'package:youtube_translation/provider/screen_provider/screen_provider.dart';
 import 'package:youtube_translation/screens/translator_screen/local_widgets/drag_drop.dart';
 import 'package:youtube_translation/screens/translator_screen/local_widgets/translate_subtitle_widget/local_widgets/one_translate_item.dart';
@@ -23,24 +24,72 @@ class TranslateSubtitleWidget extends ConsumerWidget {
           Container(
             constraints: const BoxConstraints(minWidth: 115),
             padding: const EdgeInsets.only(top: 13),
-            child: Row(
+            child: Column(
               mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                if (ts.translatorLoadingState.readingSrt)
-                  const SizedBox(
-                      width: 10,
-                      height: 10,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
-                      )),
-                const SizedBox(width: 3),
-                const Text(
-                  'Subtitles : ',
-                  textAlign: TextAlign.end,
-                  style: TextStyle(color: Colors.white, fontSize: 18),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    if (ts.translatorLoadingState.readingSrt)
+                      const SizedBox(
+                          width: 10,
+                          height: 10,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          )),
+                    const SizedBox(width: 3),
+                    const Text(
+                      'Subtitles : ',
+                      textAlign: TextAlign.end,
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    ),
+                  ],
                 ),
+                Container(
+                  margin: const EdgeInsets.only(top: 8, right: 7),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(width: 1, color: Colors.white)),
+                  child: IntrinsicWidth(
+                    child: Column(mainAxisSize: MainAxisSize.min, children: [
+                      _changeStyleWidget(ref, SubtitleOneType.talk),
+                      Container(
+                        height: 1,
+                        width: double.infinity,
+                        color: Colors.grey.shade700,
+                      ),
+                      _changeStyleWidget(ref, SubtitleOneType.text),
+                      Container(
+                        height: 1,
+                        width: double.infinity,
+                        color: Colors.grey.shade700,
+                      ),
+                      _changeStyleWidget(ref, SubtitleOneType.narration),
+                    ]),
+                  ),
+                ),
+                SizedBox(height: 30),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('Strict to '
+                        '\neach sentence', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 13),),
+                    Checkbox(
+                        value: ref.watch(translatorProvider
+                            .select((selector) => selector.strictTextRole)),
+                        onChanged: (set) {
+                          if(set != null) {
+                            ref
+                                .read(translatorProvider.notifier)
+                                .setStrictTextRole =
+                                set;
+                          }
+                        }),
+                  ],
+                )
               ],
             ),
           ),
@@ -55,6 +104,20 @@ class TranslateSubtitleWidget extends ConsumerWidget {
               height: double.infinity,
               child: _subtitles(ref)),
         ],
+      ),
+    );
+  }
+
+  Widget _changeStyleWidget(WidgetRef ref, SubtitleOneType subtitleOneType) {
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () {
+        ref.read(translatorProvider.notifier).setAllLang(type: subtitleOneType);
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 8),
+        child: Text(subtitleOneType.name,
+            style: const TextStyle(color: Colors.white, fontSize: 14)),
       ),
     );
   }
@@ -87,36 +150,31 @@ class TranslateSubtitleWidget extends ConsumerWidget {
         fit: StackFit.expand,
         children: [
           ListView.builder(
-              key: ValueKey(
-                'subtitle - ${ts.translatorDataState.translatedCount} - ${ref
-                    .watch(
-                    screenProvider.select((value) => value.languageCode))}'),
-                padding: EdgeInsets.zero,
-                itemCount: translateList.length,
-                itemBuilder: (context, index) =>
-                    OneTranslateItem(
-                        oneTranslate: translateList[index],
-                        translatedText: translateList[index].getLang(
-                            ss.languageCode)),
-              ),
-              if (ts.translatorLoadingState.loadingPercentage != null)
-          Container(
-            color: Colors.black.withOpacity(.6),
-            child: Center(
-                child: Text(
-                  'Translate loading ${ts.translatorLoadingState
-                      .loadingPercentage}%',
-                  style: const TextStyle(color: Colors.white, fontSize: 23),
-                )),
+            key: ValueKey(
+                'subtitle - ${ts.translatorDataState.translatedCount} - ${ref.watch(screenProvider.select((value) => value.languageCode))}'),
+            padding: EdgeInsets.zero,
+            itemCount: translateList.length,
+            itemBuilder: (context, index) => OneTranslateItem(
+                oneTranslate: translateList[index],
+                translatedText: translateList[index].getLang(ss.languageCode)),
           ),
+          if (ts.translatorLoadingState.loadingPercentage != null)
+            Container(
+              color: Colors.black.withOpacity(.6),
+              child: Center(
+                  child: Text(
+                'Translate loading ${ts.translatorLoadingState.loadingPercentage}%',
+                style: const TextStyle(color: Colors.white, fontSize: 23),
+              )),
+            ),
           if (ts.translatorLoadingState.gettingAudio)
             Container(
               color: Colors.black.withOpacity(.6),
               child: const Center(
                   child: Text(
-                    'Downloading TTS audio',
-                    style: TextStyle(color: Colors.white, fontSize: 23),
-                  )),
+                'Downloading TTS audio',
+                style: TextStyle(color: Colors.white, fontSize: 23),
+              )),
             )
         ],
       );
@@ -238,23 +296,28 @@ class TranslateSubtitleWidget extends ConsumerWidget {
         !ts.translatorDataState.translatedToEn &&
         ts.translatorDataState.translateList.isNotEmpty) {
       color = Colors.white;
-      onTap = () {
+      onTap = () async {
         var t = ref.read(translatorProvider.notifier);
-        t.translateToTargetLang(
-            fromLanguageCode: Languages.original, toLanguageCode: Languages.en);
+        try {
+          await t.translateToTargetLang(
+              fromLanguageCode: Languages.original,
+              toLanguageCode: Languages.en);
+        } catch (e) {
+          print('why ? >${e}');
+        }
       };
     }
     return Expanded(
         child: GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTap: onTap,
-          child: Center(
-            child: Text(
-              'Translate to English',
-              style: TextStyle(color: color, fontSize: 17),
-            ),
-          ),
-        ));
+      behavior: HitTestBehavior.translucent,
+      onTap: onTap,
+      child: Center(
+        child: Text(
+          'Translate to English',
+          style: TextStyle(color: color, fontSize: 17),
+        ),
+      ),
+    ));
   }
 
   Widget translateToAllBtn(WidgetRef ref) {
@@ -273,14 +336,14 @@ class TranslateSubtitleWidget extends ConsumerWidget {
     }
     return Expanded(
         child: GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTap: onTap,
-          child: Center(
-            child: Text(
-              'Translate to All',
-              style: TextStyle(color: color, fontSize: 17),
-            ),
-          ),
-        ));
+      behavior: HitTestBehavior.translucent,
+      onTap: onTap,
+      child: Center(
+        child: Text(
+          'Translate to All',
+          style: TextStyle(color: color, fontSize: 17),
+        ),
+      ),
+    ));
   }
 }

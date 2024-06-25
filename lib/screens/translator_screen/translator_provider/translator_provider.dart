@@ -42,6 +42,10 @@ class Translator extends _$Translator with TranslatorDataMixin {
             youtubeRepositoryState: yrs));
   }
 
+  set setStrictTextRole(bool set){
+    state = state.copyWith(strictTextRole: set);
+  }
+
   set setVideoInputType(VideoInputType type) {
     state = state.copyWith(videoInputType: type);
   }

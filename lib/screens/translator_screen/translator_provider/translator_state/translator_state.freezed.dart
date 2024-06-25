@@ -23,7 +23,8 @@ mixin _$TranslatorState {
   TranslatorDataState get translatorDataState =>
       throw _privateConstructorUsedError;
   TranslatorLoadingState get translatorLoadingState =>
-      throw _privateConstructorUsedError; //repositories
+      throw _privateConstructorUsedError;
+  bool get strictTextRole => throw _privateConstructorUsedError; //repositories
   @protected
   YoutubeRepositoryState get youtubeRepositoryState =>
       throw _privateConstructorUsedError;
@@ -49,6 +50,7 @@ abstract class $TranslatorStateCopyWith<$Res> {
       bool addOriginal,
       TranslatorDataState translatorDataState,
       TranslatorLoadingState translatorLoadingState,
+      bool strictTextRole,
       @protected YoutubeRepositoryState youtubeRepositoryState,
       @protected UserRepositoryState userRepositoryState});
 
@@ -79,6 +81,7 @@ class _$TranslatorStateCopyWithImpl<$Res, $Val extends TranslatorState>
     Object? addOriginal = null,
     Object? translatorDataState = null,
     Object? translatorLoadingState = null,
+    Object? strictTextRole = null,
     Object? youtubeRepositoryState = null,
     Object? userRepositoryState = null,
   }) {
@@ -107,6 +110,10 @@ class _$TranslatorStateCopyWithImpl<$Res, $Val extends TranslatorState>
           ? _value.translatorLoadingState
           : translatorLoadingState // ignore: cast_nullable_to_non_nullable
               as TranslatorLoadingState,
+      strictTextRole: null == strictTextRole
+          ? _value.strictTextRole
+          : strictTextRole // ignore: cast_nullable_to_non_nullable
+              as bool,
       youtubeRepositoryState: null == youtubeRepositoryState
           ? _value.youtubeRepositoryState
           : youtubeRepositoryState // ignore: cast_nullable_to_non_nullable
@@ -194,6 +201,7 @@ abstract class _$$TranslatorStateImplCopyWith<$Res>
       bool addOriginal,
       TranslatorDataState translatorDataState,
       TranslatorLoadingState translatorLoadingState,
+      bool strictTextRole,
       @protected YoutubeRepositoryState youtubeRepositoryState,
       @protected UserRepositoryState userRepositoryState});
 
@@ -228,6 +236,7 @@ class __$$TranslatorStateImplCopyWithImpl<$Res>
     Object? addOriginal = null,
     Object? translatorDataState = null,
     Object? translatorLoadingState = null,
+    Object? strictTextRole = null,
     Object? youtubeRepositoryState = null,
     Object? userRepositoryState = null,
   }) {
@@ -256,6 +265,10 @@ class __$$TranslatorStateImplCopyWithImpl<$Res>
           ? _value.translatorLoadingState
           : translatorLoadingState // ignore: cast_nullable_to_non_nullable
               as TranslatorLoadingState,
+      strictTextRole: null == strictTextRole
+          ? _value.strictTextRole
+          : strictTextRole // ignore: cast_nullable_to_non_nullable
+              as bool,
       youtubeRepositoryState: null == youtubeRepositoryState
           ? _value.youtubeRepositoryState
           : youtubeRepositoryState // ignore: cast_nullable_to_non_nullable
@@ -278,6 +291,7 @@ class _$TranslatorStateImpl extends _TranslatorState {
       this.addOriginal = false,
       required this.translatorDataState,
       this.translatorLoadingState = const TranslatorLoadingState(),
+      this.strictTextRole = false,
       @protected required this.youtubeRepositoryState,
       @protected required this.userRepositoryState})
       : super._();
@@ -297,6 +311,9 @@ class _$TranslatorStateImpl extends _TranslatorState {
   @override
   @JsonKey()
   final TranslatorLoadingState translatorLoadingState;
+  @override
+  @JsonKey()
+  final bool strictTextRole;
 //repositories
   @override
   @protected
@@ -307,7 +324,7 @@ class _$TranslatorStateImpl extends _TranslatorState {
 
   @override
   String toString() {
-    return 'TranslatorState(videoInputType: $videoInputType, uploadPercentage: $uploadPercentage, videoUpload: $videoUpload, addOriginal: $addOriginal, translatorDataState: $translatorDataState, translatorLoadingState: $translatorLoadingState, youtubeRepositoryState: $youtubeRepositoryState, userRepositoryState: $userRepositoryState)';
+    return 'TranslatorState(videoInputType: $videoInputType, uploadPercentage: $uploadPercentage, videoUpload: $videoUpload, addOriginal: $addOriginal, translatorDataState: $translatorDataState, translatorLoadingState: $translatorLoadingState, strictTextRole: $strictTextRole, youtubeRepositoryState: $youtubeRepositoryState, userRepositoryState: $userRepositoryState)';
   }
 
   @override
@@ -327,6 +344,8 @@ class _$TranslatorStateImpl extends _TranslatorState {
                 other.translatorDataState == translatorDataState) &&
             (identical(other.translatorLoadingState, translatorLoadingState) ||
                 other.translatorLoadingState == translatorLoadingState) &&
+            (identical(other.strictTextRole, strictTextRole) ||
+                other.strictTextRole == strictTextRole) &&
             (identical(other.youtubeRepositoryState, youtubeRepositoryState) ||
                 other.youtubeRepositoryState == youtubeRepositoryState) &&
             (identical(other.userRepositoryState, userRepositoryState) ||
@@ -342,6 +361,7 @@ class _$TranslatorStateImpl extends _TranslatorState {
       addOriginal,
       translatorDataState,
       translatorLoadingState,
+      strictTextRole,
       youtubeRepositoryState,
       userRepositoryState);
 
@@ -361,6 +381,7 @@ abstract class _TranslatorState extends TranslatorState {
       final bool addOriginal,
       required final TranslatorDataState translatorDataState,
       final TranslatorLoadingState translatorLoadingState,
+      final bool strictTextRole,
       @protected required final YoutubeRepositoryState youtubeRepositoryState,
       @protected
       required final UserRepositoryState
@@ -379,6 +400,8 @@ abstract class _TranslatorState extends TranslatorState {
   TranslatorDataState get translatorDataState;
   @override
   TranslatorLoadingState get translatorLoadingState;
+  @override
+  bool get strictTextRole;
   @override //repositories
   @protected
   YoutubeRepositoryState get youtubeRepositoryState;

@@ -10,7 +10,7 @@ abstract class OpenAiClient {
   factory OpenAiClient(Dio dio, {String baseUrl}) = _OpenAiClient;
   static const baseUrl = 'https://api.openai.com/v1/';
 
-  @POST('completions')
+  @POST('chat/completions')
   Future<HttpResponse> translateText(
     @Header('Authorization') String authorization,
     @Header('Content-Type') String contentType,

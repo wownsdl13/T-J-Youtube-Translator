@@ -8,6 +8,7 @@ import 'package:youtube_translation/data/client/remote/open_ai_client/open_ai_cl
 import 'package:youtube_translation/data/repository/remote/open_ai_repository/chat_gpt/gpt_response.dart';
 import 'package:youtube_translation/models/one_translate/one_translate.dart';
 import 'package:youtube_translation/utils/languages.dart';
+import 'dart:html' as html;
 
 part 'open_ai_repository_state.freezed.dart';
 
@@ -24,7 +25,7 @@ class OpenAiRepositoryState with _$OpenAiRepositoryState {
     final formData = FormData.fromMap({
       'file': MultipartFile.fromBytes(data, filename: 'audio.mp3'),
       'response_format': 'srt',
-      'model':'whisper-1'
+      'model': 'whisper-1'
     });
 
     try {
@@ -43,7 +44,7 @@ class OpenAiRepositoryState with _$OpenAiRepositoryState {
       } else {
         print('Error: ${response.statusCode} - ${response.statusMessage}');
       }
-    }catch(e){
+    } catch (e) {
       print('error > $e');
     }
     throw Exception();
@@ -60,7 +61,7 @@ class OpenAiRepositoryState with _$OpenAiRepositoryState {
           {
             'role': 'user',
             'content': """{
-              "Translate this text": {"text":"$text"},
+              "Translate this text": $text,
               "Target language": $targetLanguageCode,
               "Format": "json: {"text":"translatedText"}",
               "Conditions": ["Keep it friendly, considering it's for a YouTube title, description", "Don't forget to use proper spacing", "If the sentence is incorrect, please correct it", "Keep original if language is same with original", "it's really important. you must fill in everything. don't miss it"]
@@ -74,7 +75,9 @@ class OpenAiRepositoryState with _$OpenAiRepositoryState {
     ).timeout(const Duration(seconds: 620));
 
     if (response.response.statusCode == 200) {
-      return response.data;
+      var gpt = GptResponse.fromJson(response.data);
+      var t = jsonDecode(gpt.text);
+      return t['text'];
     } else {
       print(
           'Error: ${response.response.statusCode} - ${response.response.statusMessage}');
@@ -86,30 +89,65 @@ class OpenAiRepositoryState with _$OpenAiRepositoryState {
       List<OneTranslate> originalTranslateList,
       {required String fromLanguageCode,
       required String toLanguageCode,
-      required String openAiApiKey}) async {
+      required String openAiApiKey,
+      required bool strictTextRole}) async {
     final textList = originalTranslateList
         .map((item) => item.getLang(fromLanguageCode))
         .toList();
-    final translatedTextMap = await _translateToTargetBatch(textList,
-        languageCode: toLanguageCode, openAiApiKey: openAiApiKey);
+
     var translateList = <OneTranslate>[];
-    for (var index = 0; index < originalTranslateList.length; index++) {
-      var oneTranslate = originalTranslateList[index];
-      var t = Map<String, String>.from(oneTranslate.translations);
-      t[toLanguageCode] = translatedTextMap[index] ?? '';
-      var newOne = oneTranslate.copyWith(translations: t);
-      translateList.add(newOne);
+    int batchSize = 100;
+    int contextSize = 20;
+
+    for (var i = 0; i < textList.length; i += batchSize) {
+      var contextStartIndex = (i >= contextSize) ? i - contextSize : 0;
+      var contextList = textList.sublist(contextStartIndex, i);
+      var batchEndIndex =
+          (i + batchSize > textList.length) ? textList.length : i + batchSize;
+      var batchList =
+          textList.sublist(i, batchEndIndex); // index 0 - 99, 100 - 199 ...
+
+      // 문맥 포함 번역 요청
+      var translatedTextMap = await _translateToTargetBatch(
+          contextList, batchList,
+          languageCode: toLanguageCode,
+          openAiApiKey: openAiApiKey,
+          strictTextRole: strictTextRole);
+
+      // 원래 100개의 번역만 추출
+      for (var index = 0;
+          index < batchSize && (i + index) < originalTranslateList.length;
+          index++) {
+        var oneTranslate = originalTranslateList[i + index];
+        var t = Map<String, String>.from(oneTranslate.translations);
+        t[toLanguageCode] = translatedTextMap[index] ?? '';
+        var newOne = oneTranslate.copyWith(translations: t);
+        translateList.add(newOne);
+      }
     }
     return translateList;
   }
 
-  Future<Map<int, String>> _translateToTargetBatch(List<String> texts,
-      {required String languageCode, required String openAiApiKey}) async {
+  Future<Map<int, String>> _translateToTargetBatch(
+      List<String> contextList, List<String> batchList,
+      {required String languageCode,
+      required String openAiApiKey,
+      required bool strictTextRole}) async {
     var language = Languages.langName(languageCode);
+
     var textMap = <String, String>{};
-    for (var index = 0; index < texts.length; index++) {
-      textMap[index.toString()] = texts[index];
+    for (var index = 0; index < batchList.length; index++) {
+      textMap[index.toString()] = batchList[index];
     }
+
+    var contextText = contextList.join('\n');
+
+    String strict = '';
+    if (strictTextRole) {
+      strict =
+          'Keep in mind that I want the translation to stay within the given text';
+    }
+
     final response = await client.translateText(
       'Bearer $openAiApiKey',
       'application/json; charset=utf-8',
@@ -119,10 +157,11 @@ class OpenAiRepositoryState with _$OpenAiRepositoryState {
           {
             'role': 'user',
             'content': """{
-              "Translate the following texts (original) to $language": "${jsonEncode(textMap)}",
-              "Format": "json: { 0: "translated", 1: "translated", ... }",
-              "Conditions": ["Make the translations natural and fluent", "It's subtitles so consider about whole context when you translate it", "When translating, do not attach periods and commas at the end of the result", "Just keep the original if translated language is same", "YOU MUST TRANSLATE ALL. Check yourself and if there's blank, then fill it"]
-            }""",
+            "Translate the following texts (original) to $language": "${jsonEncode(textMap)}",
+            "Previous context": "$contextText",
+            "Format": "json: { 0: "translated", 1: "translated", ... }",
+            "Conditions": ["Make the translations natural and fluent", "It's subtitles, so consider the whole context when translating. $strict", "When translating, do not attach periods and commas at the end of the result"]
+          }""",
           }
         ],
         'temperature': 0,
@@ -131,15 +170,37 @@ class OpenAiRepositoryState with _$OpenAiRepositoryState {
       },
     ).timeout(const Duration(seconds: 620));
 
-    if (response.response.statusCode == 200) {
-      var gpt = GptResponse.fromJson(response.data);
-      var map = (jsonDecode(gpt.text) as Map)
-          .map((key, value) => MapEntry(int.parse(key), value.toString()));
-      return map;
-    } else {
-      print(
-          'Error: ${response.response.statusCode} - ${response.response.statusMessage}');
+    late String gptText;
+    try {
+      if (response.response.statusCode == 200) {
+        var gpt = GptResponse.fromJson(response.data);
+        gptText = gpt.text;
+        var map = (jsonDecode(gpt.text) as Map)
+            .map((key, value) => MapEntry(int.parse(key), value.toString()));
+        return map;
+      } else {
+        print(
+            'Error: ${response.response.statusCode} - ${response.response.statusMessage}');
+      }
+    } catch (e) {
+      _downloadData(utf8.encode(gptText), name: 'error log');
+      print('why? > ${e}');
     }
+
     throw Exception();
+  }
+
+  void _downloadData(Uint8List data, {required String name}) {
+    // Encode our file in base64
+    final base64 = base64Encode(data);
+    final anchor =
+        html.AnchorElement(href: 'data:application/octet-stream;base64,$base64')
+          ..target = 'blank';
+    // add the name
+    anchor.download = name;
+    // trigger download
+    html.document.body?.append(anchor);
+    anchor.click();
+    anchor.remove();
   }
 }

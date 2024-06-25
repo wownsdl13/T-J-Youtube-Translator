@@ -19,6 +19,7 @@ class TranslatorState with _$TranslatorState {
     required TranslatorDataState translatorDataState,
     @Default(TranslatorLoadingState())
     TranslatorLoadingState translatorLoadingState,
+    @Default(false) bool strictTextRole,
     //repositories
     @protected required YoutubeRepositoryState youtubeRepositoryState,
     @protected required UserRepositoryState userRepositoryState,

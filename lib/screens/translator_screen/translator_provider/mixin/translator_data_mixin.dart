@@ -24,13 +24,10 @@ mixin TranslatorDataMixin<T extends TranslatorState> {
     var txt = utf8.decode(data);
     var srtList = SrtSplitUtil(txt).split;
     var translateList = srtList
-        .map((srt) => OneTranslate(
-                order: srt.order,
-                period: srt.period,
-                translations: {
-                  Languages.original: srt.text,
-                  Languages.ko: srt.text
-                }))
+        .map((srt) =>
+            OneTranslate(order: srt.order, period: srt.period, translations: {
+              Languages.original: srt.text,
+            }))
         .toList();
     state = state.copyWith.translatorDataState(
         translate: state.translatorDataState.translate
@@ -116,20 +113,40 @@ mixin TranslatorDataMixin<T extends TranslatorState> {
     }
   }
 
+  Future setAllLang({required SubtitleOneType type}) async {
+    var oldList =
+        List<OneTranslate>.from(state.translatorDataState.translateList);
+    if (oldList.isNotEmpty) {
+      var newList = <OneTranslate>[];
+      for (var o in oldList) {
+        var newModel = o.copyWith(subtitleOneType: type);
+        newList.add(newModel);
+      }
+      state = state.copyWith.translatorDataState(
+          translate: state.translatorDataState.translate
+              .copyWith(translates: newList));
+      ref.read(subtitleRepositoryProvider.notifier).uploadSubtitle(
+          translate: state.translatorDataState.translate
+              .copyWith(translates: newList));
+    }
+  }
+
   void setOneTranslateType(OneTranslate model,
       {required SubtitleOneType type}) {
     var oldList =
         List<OneTranslate>.from(state.translatorDataState.translateList);
-    var index = oldList.indexOf(model);
-    oldList.remove(model);
-    var newModel = model.copyWith(subtitleOneType: type);
-    oldList.insert(index, newModel);
-    state = state.copyWith.translatorDataState(
-        translate:
-            state.translatorDataState.translate.copyWith(translates: oldList));
-    ref.read(subtitleRepositoryProvider.notifier).uploadSubtitle(
-        translate: state.translatorDataState.translate
-            .copyWith(translates: [newModel]));
+    if (oldList.isNotEmpty) {
+      var index = oldList.indexOf(model);
+      oldList.remove(model);
+      var newModel = model.copyWith(subtitleOneType: type);
+      oldList.insert(index, newModel);
+      state = state.copyWith.translatorDataState(
+          translate: state.translatorDataState.translate
+              .copyWith(translates: oldList));
+      ref.read(subtitleRepositoryProvider.notifier).uploadSubtitle(
+          translate: state.translatorDataState.translate
+              .copyWith(translates: [newModel]));
+    }
   }
 
   set setAddOriginal(bool addOriginal) {
@@ -220,7 +237,8 @@ mixin TranslatorDataMixin<T extends TranslatorState> {
           .translateToTargetLang(list,
               openAiApiKey: openAiApiKey,
               fromLanguageCode: fromLanguageCode,
-              toLanguageCode: toLanguageCode);
+              toLanguageCode: toLanguageCode,
+              strictTextRole: state.strictTextRole);
       state = state.copyWith.translatorDataState(
           translate: state.translatorDataState.translate
               .copyWith(translates: englishTranslates));
@@ -246,7 +264,9 @@ mixin TranslatorDataMixin<T extends TranslatorState> {
       if (list.isEmpty) {
         return;
       }
-      var langList = Languages.captionsLangList;
+      // remove en because en is already translated
+      var langList = Languages.captionsLangList..remove(Languages.en);
+
       var doneCount = 0;
       for (var lang in langList) {
         doneCount++;
@@ -259,27 +279,29 @@ mixin TranslatorDataMixin<T extends TranslatorState> {
         }
         var list = state.translatorDataState.translateList;
         var fromLanguageCode = Languages.en;
-        // if it's japanese then translate from original (korean)
+        // if it's japanese then translate from ko (korean)
+        // because of captionsLangList order, korean translated first
         if (lang == Languages.ja) {
-          fromLanguageCode = Languages.original;
+          fromLanguageCode = Languages.ko;
         }
-        var englishTranslates = await ref
+        var translates = await ref
             .read(openAiRepositoryProvider)
             .translateToTargetLang(list,
                 openAiApiKey: openAiApiKey,
                 fromLanguageCode: fromLanguageCode,
-                toLanguageCode: lang);
+                toLanguageCode: lang,
+                strictTextRole: state.strictTextRole);
 
         state = state.copyWith(
             translatorDataState: state.translatorDataState.copyWith(
                 translate: state.translatorDataState.translate
-                    .copyWith(translates: englishTranslates)),
+                    .copyWith(translates: translates)),
             translatorLoadingState: state.translatorLoadingState
                 .copyWith(loadingPercentage: percentage));
+        await ref
+            .read(subtitleRepositoryProvider.notifier)
+            .uploadSubtitle(translate: state.translatorDataState.translate);
       }
-      await ref
-          .read(subtitleRepositoryProvider.notifier)
-          .uploadSubtitle(translate: state.translatorDataState.translate);
       state = state.copyWith
           .translatorLoadingState(readingSrt: false, loadingPercentage: null);
       WakelockPlus.disable();

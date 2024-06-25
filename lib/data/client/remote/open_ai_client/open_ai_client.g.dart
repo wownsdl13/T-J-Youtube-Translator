@@ -13,7 +13,7 @@ class _OpenAiClient implements OpenAiClient {
     this._dio, {
     this.baseUrl,
   }) {
-    baseUrl ??= 'api.openai.com/v1/';
+    baseUrl ??= 'https://api.openai.com/v1/';
   }
 
   final Dio _dio;
@@ -44,7 +44,7 @@ class _OpenAiClient implements OpenAiClient {
     )
             .compose(
               _dio.options,
-              'completions',
+              'chat/completions',
               queryParameters: queryParameters,
               data: _data,
             )
