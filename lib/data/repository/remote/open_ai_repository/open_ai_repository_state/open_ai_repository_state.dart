@@ -25,12 +25,13 @@ class OpenAiRepositoryState with _$OpenAiRepositoryState {
     final formData = FormData.fromMap({
       'file': MultipartFile.fromBytes(data, filename: 'audio.mp3'),
       'response_format': 'srt',
-      'model': 'whisper-1'
+      'model': 'whisper-1',
+      // 'language': 'en', // 번역 작업 지정
     });
 
     try {
       var response = await Dio().post(
-        '${OpenAiClient.baseUrl}audio/transcriptions',
+        '${OpenAiClient.baseUrl}audio/translations',
         data: formData,
         options: Options(
           headers: {
@@ -42,6 +43,7 @@ class OpenAiRepositoryState with _$OpenAiRepositoryState {
         final transcription = response.data;
         return transcription;
       } else {
+        //
         print('Error: ${response.statusCode} - ${response.statusMessage}');
       }
     } catch (e) {
