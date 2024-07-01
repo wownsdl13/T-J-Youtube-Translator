@@ -278,6 +278,7 @@ mixin TranslatorDataMixin<T extends TranslatorState> {
           continue;
         }
         var list = state.translatorDataState.translateList;
+
         var fromLanguageCode = Languages.en;
         // if it's japanese then translate from ko (korean)
         // because of captionsLangList order, korean translated first

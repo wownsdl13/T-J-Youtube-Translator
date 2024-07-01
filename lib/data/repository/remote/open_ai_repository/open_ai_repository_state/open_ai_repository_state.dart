@@ -99,13 +99,14 @@ class OpenAiRepositoryState with _$OpenAiRepositoryState {
 
     var translateList = <OneTranslate>[];
     int batchSize = 100;
-    int contextSize = 20;
+    int contextSize = 10;
 
     for (var i = 0; i < textList.length; i += batchSize) {
+      print('batch > $i');
       var contextStartIndex = (i >= contextSize) ? i - contextSize : 0;
       var contextList = textList.sublist(contextStartIndex, i);
       var batchEndIndex =
-          (i + batchSize > textList.length) ? textList.length : i + batchSize;
+          (i + batchSize > textList.length) ? textList.length : (i + batchSize);
       var batchList =
           textList.sublist(i, batchEndIndex); // index 0 - 99, 100 - 199 ...
 
@@ -135,21 +136,23 @@ class OpenAiRepositoryState with _$OpenAiRepositoryState {
       {required String languageCode,
       required String openAiApiKey,
       required bool strictTextRole}) async {
-    var language = Languages.langName(languageCode);
-
-    var textMap = <String, String>{};
+    var textMap = <String, dynamic>{};
     for (var index = 0; index < batchList.length; index++) {
-      textMap[index.toString()] = batchList[index];
+      textMap[index.toString()] = {
+        'original': batchList[index],
+        'translated': null
+      };
     }
 
     var contextText = contextList.join('\n');
 
-    String strict = '';
+    String strict =
+        '';
     if (strictTextRole) {
-      strict =
-          'Keep in mind that I want the translation to stay within the given text';
+      strict = "\"This is a conversation about a certain topic\",";
     }
 
+    //"$context": "$contextText",
     final response = await client.translateText(
       'Bearer $openAiApiKey',
       'application/json; charset=utf-8',
@@ -159,10 +162,16 @@ class OpenAiRepositoryState with _$OpenAiRepositoryState {
           {
             'role': 'user',
             'content': """{
-            "Translate the following texts (original) to $language": "${jsonEncode(textMap)}",
+            "Translate:${jsonEncode(textMap)}",
+            "translate language: $languageCode",
+            "Format": "json {0:{original:original, translated:translated}, 1...}",
             "Previous context": "$contextText",
-            "Format": "json: { 0: "translated", 1: "translated", ... }",
-            "Conditions": ["Make the translations natural and fluent", "It's subtitles, so consider the whole context when translating. $strict", "When translating, do not attach periods and commas at the end of the result"]
+            'Conditions': [
+            'Make the translations natural and fluent considering whole context',
+            'Translate original to translated',
+            $strict
+            'copy original to translated if it's same language'
+            ]
           }""",
           }
         ],
@@ -171,14 +180,13 @@ class OpenAiRepositoryState with _$OpenAiRepositoryState {
         'response_format': {'type': 'json_object'}
       },
     ).timeout(const Duration(seconds: 620));
-
     late String gptText;
     try {
       if (response.response.statusCode == 200) {
         var gpt = GptResponse.fromJson(response.data);
         gptText = gpt.text;
-        var map = (jsonDecode(gpt.text) as Map)
-            .map((key, value) => MapEntry(int.parse(key), value.toString()));
+        var map = (jsonDecode(gpt.text) as Map).map((key, value) =>
+            MapEntry(int.parse(key), value['translated'].toString()));
         return map;
       } else {
         print(
