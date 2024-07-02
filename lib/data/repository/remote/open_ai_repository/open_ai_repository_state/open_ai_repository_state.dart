@@ -179,7 +179,7 @@ class OpenAiRepositoryState with _$OpenAiRepositoryState {
         'max_tokens': 4096,
         'response_format': {'type': 'json_object'}
       },
-    ).timeout(const Duration(seconds: 620));
+    ).timeout(const Duration(minutes: 30));
     late String gptText;
     try {
       if (response.response.statusCode == 200) {

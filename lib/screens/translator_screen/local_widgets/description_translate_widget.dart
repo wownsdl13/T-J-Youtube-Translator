@@ -131,7 +131,7 @@ class _DescriptionTranslateWidgetState
               children: [
                 Expanded(
                     child: Text(
-                  ts.translatorDataState.translatedDescriptionText!,
+                  ts.translatorDataState.translatedDescriptionText ?? '',
                   style: const TextStyle(
                       color: Colors.white, fontSize: 16, height: 1.3),
                 )),
