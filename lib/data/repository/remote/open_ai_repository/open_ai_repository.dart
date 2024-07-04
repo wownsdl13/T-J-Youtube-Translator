@@ -5,7 +5,7 @@ import 'package:youtube_translation/data/repository/remote/open_ai_repository/op
 
 part 'open_ai_repository.g.dart';
 
-@Riverpod()//
+@Riverpod()
 class OpenAiRepository extends _$OpenAiRepository{
   @override
   OpenAiRepositoryState build(){
