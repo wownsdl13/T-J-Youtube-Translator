@@ -163,12 +163,12 @@ class OpenAiRepositoryState with _$OpenAiRepositoryState {
             'role': 'user',
             'content': """{
             "Translate:${jsonEncode(textMap)}",
-            "translate language: $languageCode",
+            "translate to this language: $languageCode",
             "Format": "json {0:{original:original, translated:translated}, 1...}",
             "Previous context": "$contextText",
             'Conditions': [
             'Make the translations natural and fluent considering whole context',
-            'Translate original to translated',
+            'Translate original value to translated',
             $strict
             'copy original to translated if it's same language'
             ]
